@@ -7,6 +7,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _playerMovementSpeed;
 
+    [Header("Slope Handler Variables")]
+    [SerializeField]
+    private float _maxSlope; // max slope 
+
+    private RaycastHit _slopeHit; // checks the feet of the player to identify the angle of the player in relations to the ground
+
     private Rigidbody _rb;
     private Vector3 _movementDirection;
 

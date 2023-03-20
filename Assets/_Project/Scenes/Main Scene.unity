@@ -608,7 +608,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32124
+  m_Name: pb_Mesh27536
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2941,7 +2941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ced8ed576efc2447859b63cfd2b8af4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementSmoothingSpeed: 10
+  _movementSmoothingSpeed: 9
   _playerMovementScript: {fileID: 1774504540}
   _playerLookScript: {fileID: 1530587722}
 --- !u!114 &1774504540
@@ -2957,6 +2957,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMovementSpeed: 5
+  _maxSlope: 0
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0
