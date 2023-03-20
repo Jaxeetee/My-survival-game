@@ -52,7 +52,8 @@ public class PlayerController : MonoBehaviour
 
     private void UpdatePlayerMovement()
     {
-        _playerMovementScript.UpdateInputMovementValue(_smoothInputMovement);
+        _playerMovementScript.UpdateInputMovementValue(_rawMovementInputAxis);
+        Debug.Log(_rawMovementInputAxis); 
     }
 
     private void UpdatePlayerLook()
@@ -67,27 +68,15 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void OnEnable() 
-    {
-        
-    }
-
     private void OnDisable() 
     {
         _playerInput.actions["Movement"].performed -= OnMovement;
         _playerInput.actions["Movement"].canceled -= OnMovement;
-
+        
         _playerInput.actions["Look"].performed -= OnLook;
         _playerInput.actions["Look"].canceled -= OnLook;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (_playerInput != null)
@@ -98,18 +87,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-
-        CalculateMovementInputSmoothing();
+        #region --- PLAYER INPUT UPDATE ---
         UpdatePlayerMovement();
 
         UpdatePlayerLook();
+        #endregion
     }
-
-    private void LateUpdate() {
-        
-    }
-
-
     #endregion
 
 
