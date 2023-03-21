@@ -124,6 +124,12 @@ public class PlayerMovement : MonoBehaviour
 
 #region -= JUMP =-
 
+    private void Jump()
+    {
+        // TODO: AddForce();
+        _rb.AddForce(transform.up * _jumpForce);
+    }
+
 #endregion
 
 #region -= INPUT =-

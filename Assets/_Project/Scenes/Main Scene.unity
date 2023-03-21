@@ -2965,8 +2965,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMovementSpeed: 5
-  _smoothMultiplier: 9
+  _smoothMovementMultiplier: 7
   _maxSlope: 75
+  _crouchSpeed: 0
+  _jumpForce: 0
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0

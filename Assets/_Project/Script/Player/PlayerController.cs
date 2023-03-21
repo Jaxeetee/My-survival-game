@@ -22,6 +22,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 _rawMouseInputDelta;
     #endregion
 
+    #region --- JUMP ---
+
+    #endregion
+
     #region --- REFERENCE PLAYER SCRIPTS ---
     [Space]
     [Header("Reference Player Scripts")]
@@ -40,10 +44,17 @@ public class PlayerController : MonoBehaviour
     // has to subscribe on Update() as Player Input is doing something OnEnable() and will cause errors if subscribed OnEnable()
     private void PlayerInputInit()
     {
+        // ground movement
         _playerInput.actions["Movement"].performed += OnMovement;
         _playerInput.actions["Movement"].canceled += OnMovement;
 
+        // player jump
+        _playerInput.actions["Jump"].performed -= OnJump;
 
+        // player crouch
+         _playerInput.actions["Crouch"].performed += OnCrouch;
+
+        // player Look
         _playerInput.actions["Look"].performed += OnLook;
         _playerInput.actions["Look"].canceled += OnLook;
     }
@@ -75,6 +86,10 @@ public class PlayerController : MonoBehaviour
     {
         _playerInput.actions["Movement"].performed -= OnMovement;
         _playerInput.actions["Movement"].canceled -= OnMovement;
+
+        _playerInput.actions["Jump"].performed -= OnJump;
+
+        _playerInput.actions["Crouch"].performed -= OnCrouch;
         
         _playerInput.actions["Look"].performed -= OnLook;
         _playerInput.actions["Look"].canceled -= OnLook;
@@ -110,6 +125,16 @@ public class PlayerController : MonoBehaviour
     private void OnLook(InputAction.CallbackContext ctx)
     {
         _rawMouseInputDelta = ctx.ReadValue<Vector2>();
+    }
+
+    private void OnJump(InputAction.CallbackContext ctx)
+    {
+        
+    }
+
+    private void OnCrouch(InputAction.CallbackContext ctx)
+    {
+
     }
 
     #endregion
