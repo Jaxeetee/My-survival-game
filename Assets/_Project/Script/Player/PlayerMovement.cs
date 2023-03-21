@@ -20,8 +20,22 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
-    private Vector3 _inputDirection; // gets the raw input direction
 
+    #region --- CROUCH ---
+
+    [SerializeField]
+    private float _crouchSpeed;
+
+    #endregion
+
+    #region --- JUMP ---
+    [SerializeField]
+    private float _jumpForce;
+    #endregion
+
+    #region --- INPUT ---
+    private Vector3 _inputDirection; // gets the raw input direction
+    #endregion   
 
 
 
@@ -39,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     }
 #endregion
 
+#region -= GROUND MOVEMENT =-
 
     private void MovePlayer()
     {
@@ -95,8 +110,28 @@ public class PlayerMovement : MonoBehaviour
         return angledGround;
     }
 
+
+#endregion
+
+#region -= CROUCH & SLIDE =-
+
+    private void Crouch()
+    {
+        // TODO: Make player movement Slower
+        
+    }
+#endregion
+
+#region -= JUMP =-
+
+#endregion
+
+#region -= INPUT =-
     public void UpdateInputMovementValue(Vector3 value)
     {
         _inputDirection = value;
     }
+
+#endregion
+
 }
