@@ -12,23 +12,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(1f,10f)]
     private float _movementSmoothingSpeed = 2f;
 
-    [SerializeField]
-    private PlayerMovement _playerMovementScript;
+
     private Vector3 _rawMovementInputAxis;
     private Vector3 _smoothInputMovement;
     #endregion
 
-
     #region --- LOOK ---
     [Header("Look")]
     private Vector2 _rawMouseInputDelta;
+    #endregion
+
+    #region --- REFERENCE PLAYER SCRIPTS ---
+    [Space]
+    [Header("Reference Player Scripts")]
+
+    [SerializeField]
+    private PlayerMovement _playerMovementScript;
 
     [SerializeField]
     private PlayerLook _playerLookScript;
-
     #endregion
-
-
 
     private PlayerInput _playerInput;
 

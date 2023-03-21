@@ -5,34 +5,30 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
-    private float _playerMovementSpeed;
+    private float _playerMovementSpeed = 5.0f;
 
-    [SerializeField, Tooltip("Sets the multiplier")]
-    private float _smoothMultiplier = 1.0f;
+    [SerializeField, Range(0f, 10f)]
+    [Tooltip("The closer to 0, the slippier the feel")]
+    private float _smoothMovementMultiplier = 7.0f;
+    private float _smoothMovementSpeed = 0f;
+    private Vector3 _smoothMovement;
 
     [Header("Slope Handler Variables")]
     [SerializeField]
     private float _maxSlope; // max slope 
     private RaycastHit _slopeHit; // checks the feet of the player to identify the angle of the player in relations to the ground
 
-
-
-
-    private Rigidbody _rb;
+    private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
     private Vector3 _inputDirection; // gets the raw input direction
 
-    private Vector3 _smoothMovement;
+
 
 
 #region  -= UNITY FUNCTIONS =-
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-    }
-
-    private void Update() {
-        SmoothInput();
     }
 
     private void FixedUpdate()
@@ -44,20 +40,15 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 
-
-    public void UpdateInputMovementValue(Vector3 value)
-    {
-        _inputDirection = value;
-    }
-
     private void MovePlayer()
     {
-        Vector3 vector3 = (transform.forward * _smoothMovement.z) + (transform.right * _smoothMovement.x);
-        _movementDirection = vector3;
+        
+        _movementDirection = FrontDirection(_inputDirection);
+
         
         if (OnSlope())
         {
-            _rb.MovePosition(transform.position + GetSlopeDirection() * _playerMovementSpeed * Time.deltaTime);
+            MovePosition(GetSlopeDirection());
 
             if (_rb.velocity.y > 0)
             {
@@ -66,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            _rb.MovePosition(transform.position + _movementDirection * _playerMovementSpeed * Time.deltaTime);
+            MovePosition(_movementDirection);
         }   
     }
     
@@ -81,6 +72,12 @@ public class PlayerMovement : MonoBehaviour
         return forward * direction.z + right * direction.x;
     }
 
+    private void MovePosition(Vector3 direction)
+    {
+        _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
+        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
+    }
+
     private bool OnSlope()
     {
         if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, 2f))
@@ -93,14 +90,13 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 GetSlopeDirection()
     {
-        return Vector3.ProjectOnPlane(_movementDirection, _slopeHit.normal).normalized;
+        Vector3 angledGround = Vector3.ProjectOnPlane(_movementDirection, _slopeHit.normal);
+        Debug.Log($"Angled ground: {angledGround}");
+        return angledGround;
     }
 
-    private void SmoothInput()
+    public void UpdateInputMovementValue(Vector3 value)
     {
-        if (!OnSlope())
-            _smoothMovement = Vector3.Lerp(_smoothMovement, _inputDirection, Time.deltaTime * _smoothMultiplier);
-        else
-            _smoothMovement = _inputDirection;
+        _inputDirection = value;
     }
 }
