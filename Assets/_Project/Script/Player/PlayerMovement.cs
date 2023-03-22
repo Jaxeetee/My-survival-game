@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
-    private float _playerMovementSpeed = 5.0f;
+    private InputActionAsset _asset;
+
+    [SerializeField]
+    private float _playerNormalSpeed = 5.0f;
 
     [SerializeField, Range(0f, 10f)]
     [Tooltip("The closer to 0, the slippier the feel")]
@@ -18,24 +22,28 @@ public class PlayerMovement : MonoBehaviour
     private float _maxSlope; // max slope 
     private RaycastHit _slopeHit; // checks the feet of the player to identify the angle of the player in relations to the ground
 
+
+    private float _playerMovementSpeed;
     private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
 
-    #region --- CROUCH ---
+#region --- CROUCH ---
 
     [SerializeField]
     private float _crouchSpeed;
+    private float _inputCrouch;
+#endregion
 
-    #endregion
-
-    #region --- JUMP ---
+#region --- JUMP ---
     [SerializeField]
     private float _jumpForce;
+
+    private float _inputJump;
     #endregion
 
-    #region --- INPUT ---
+#region --- INPUT ---
     private Vector3 _inputDirection; // gets the raw input direction
-    #endregion   
+#endregion   
 
 
 
@@ -48,6 +56,8 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        Jump();
+        Crouch();
 
         _rb.useGravity = !OnSlope(); // checks if player is not on a flat surface
     }
@@ -90,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovePosition(Vector3 direction)
     {
         _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
-        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
+        _rb.MovePosition(transform.position + _smoothMovement * _playerNormalSpeed * Time.deltaTime);
     }
 
     private bool OnSlope()
@@ -118,7 +128,9 @@ public class PlayerMovement : MonoBehaviour
     private void Crouch()
     {
         // TODO: Make player movement Slower
-        
+
+        if (_inputCrouch == 0) return; // meaning if it is not pressed 
+        _playerMovementSpeed = _crouchSpeed;
     }
 #endregion
 
@@ -127,6 +139,8 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         // TODO: AddForce();
+        if (_inputJump == 0) return;
+
         _rb.AddForce(transform.up * _jumpForce);
     }
 
@@ -136,6 +150,16 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateInputMovementValue(Vector3 value)
     {
         _inputDirection = value;
+    }
+
+    public void UpdateInputCrouchValue(float value)
+    {
+        _inputCrouch = value;
+    }
+
+    public void UpdateInputJumpValue(float value)
+    {
+        _inputJump = value;
     }
 
 #endregion

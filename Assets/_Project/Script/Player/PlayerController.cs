@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
-    #region --- MOVEMENT ---
+#region --- MOVEMENT ---
     [Header("Movement")]
 
     [SerializeField, Range(1f,10f)]
@@ -15,18 +15,22 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 _rawMovementInputAxis;
     private Vector3 _smoothInputMovement;
-    #endregion
+#endregion
 
-    #region --- LOOK ---
+#region --- LOOK ---
     [Header("Look")]
     private Vector2 _rawMouseInputDelta;
-    #endregion
+#endregion
 
-    #region --- JUMP ---
+#region --- JUMP ---
+    private float _jumpInputValue;
+#endregion
 
-    #endregion
+#region --- CROUCH ---
+    private float _crouchInputValue;
+#endregion
 
-    #region --- REFERENCE PLAYER SCRIPTS ---
+#region --- REFERENCE PLAYER SCRIPTS ---
     [Space]
     [Header("Reference Player Scripts")]
 
@@ -35,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private PlayerLook _playerLookScript;
-    #endregion
+#endregion
 
     private PlayerInput _playerInput;
 
@@ -44,6 +48,7 @@ public class PlayerController : MonoBehaviour
     // has to subscribe on Update() as Player Input is doing something OnEnable() and will cause errors if subscribed OnEnable()
     private void PlayerInputInit()
     {
+        if (_playerInput.defaultActionMap != "Gameplay") return;
         // ground movement
         _playerInput.actions["Movement"].performed += OnMovement;
         _playerInput.actions["Movement"].canceled += OnMovement;
@@ -64,13 +69,22 @@ public class PlayerController : MonoBehaviour
         _smoothInputMovement = Vector3.Lerp(_smoothInputMovement, _rawMovementInputAxis, Time.deltaTime * _movementSmoothingSpeed);
     }
 
-    private void UpdatePlayerMovement()
+    private void UpdatePlayerJumpInput()
     {
-        _playerMovementScript.UpdateInputMovementValue(_rawMovementInputAxis);
-        Debug.Log(_rawMovementInputAxis); 
+        _playerMovementScript.UpdateInputJumpValue(_jumpInputValue);
     }
 
-    private void UpdatePlayerLook()
+    private void UpdatePlayerCrouchInput()
+    {
+        _playerMovementScript.UpdateInputCrouchValue(_crouchInputValue);
+    }
+
+    private void UpdatePlayerMovementInputs()
+    {
+        _playerMovementScript.UpdateInputMovementValue(_rawMovementInputAxis);
+    }
+
+    private void UpdatePlayerLookInputs()
     {
         _playerLookScript.GetMouseDelta(_rawMouseInputDelta);
     }
@@ -105,10 +119,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        #region --- PLAYER INPUT UPDATE ---
-        UpdatePlayerMovement();
-
-        UpdatePlayerLook();
+        #region -= PLAYER INPUT UPDATE =-
+        //? Contemplating to change to remove this since this will be restricted to a Player Input Component anyways
+        UpdatePlayerMovementInputs();
+        UpdatePlayerCrouchInput();
+        UpdatePlayerJumpInput();
+        UpdatePlayerLookInputs();
         #endregion
     }
     #endregion
@@ -129,12 +145,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext ctx)
     {
-        
+        _jumpInputValue = ctx.ReadValue<float>();
     }
 
     private void OnCrouch(InputAction.CallbackContext ctx)
     {
-
+        _crouchInputValue = ctx.ReadValue<float>();
     }
 
     #endregion
