@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
 #region --- CROUCH ---
     private float _crouchInputValue;
+    private bool _didPress = false;
 #endregion
 
 #region --- REFERENCE PLAYER SCRIPTS ---
@@ -54,10 +55,12 @@ public class PlayerController : MonoBehaviour
         _playerInput.actions["Movement"].canceled += OnMovement;
 
         // player jump
-        _playerInput.actions["Jump"].performed -= OnJump;
+        _playerInput.actions["Jump"].started += OnJump;
+        _playerInput.actions["Jump"].canceled += OnJump;
 
         // player crouch
-         _playerInput.actions["Crouch"].performed += OnCrouch;
+         _playerInput.actions["Crouch"].started += OnCrouchPressed;
+         _playerInput.actions["Crouch"].canceled += OnCrouchRelease;
 
         // player Look
         _playerInput.actions["Look"].performed += OnLook;
@@ -76,7 +79,12 @@ public class PlayerController : MonoBehaviour
 
     private void UpdatePlayerCrouchInput()
     {
-        _playerMovementScript.UpdateInputCrouchValue(_crouchInputValue);
+        _playerMovementScript.UpdateInputCrouchValue(_crouchInputValue);  
+    }
+
+    private void UpdateToggle(bool value)
+    {
+        _playerMovementScript.UpdateToggle(value);
     }
 
     private void UpdatePlayerMovementInputs()
@@ -101,9 +109,11 @@ public class PlayerController : MonoBehaviour
         _playerInput.actions["Movement"].performed -= OnMovement;
         _playerInput.actions["Movement"].canceled -= OnMovement;
 
-        _playerInput.actions["Jump"].performed -= OnJump;
+        _playerInput.actions["Jump"].started -= OnJump;
+        _playerInput.actions["Jump"].canceled -= OnJump;
 
-        _playerInput.actions["Crouch"].performed -= OnCrouch;
+        _playerInput.actions["Crouch"].performed -= OnCrouchPressed;
+        _playerInput.actions["Crouch"].canceled -= OnCrouchRelease;
         
         _playerInput.actions["Look"].performed -= OnLook;
         _playerInput.actions["Look"].canceled -= OnLook;
@@ -148,9 +158,22 @@ public class PlayerController : MonoBehaviour
         _jumpInputValue = ctx.ReadValue<float>();
     }
 
-    private void OnCrouch(InputAction.CallbackContext ctx)
+
+    private void OnCrouchPressed(InputAction.CallbackContext ctx)
     {
-        _crouchInputValue = ctx.ReadValue<float>();
+        if (!_didPress)
+        {
+            _crouchInputValue = ctx.ReadValue<float>();
+            _didPress = true;
+            Debug.Log($"did press {_didPress}");
+            UpdateToggle(_didPress);
+        }
+        
+    }
+
+    private void OnCrouchRelease(InputAction.CallbackContext ctx)
+    {
+        _didPress = false;
     }
 
     #endregion

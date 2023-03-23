@@ -27,34 +27,34 @@ public class DelegateTesting : MonoBehaviour
         callSomething?.Invoke();
     }
 
-    private void Start() {
+    // private void Start() {
         
-        TestingDelegateAsParam(() => {
-            Debug.Log("Detected Something");
-        });
+    //     TestingDelegateAsParam(() => {
+    //         Debug.Log("Detected Something");
+    //     });
 
-        TestingDelegateAsParam(() => {
-            float add = 1 + 1;
-            Debug.Log($"{add}");
-        });
+    //     TestingDelegateAsParam(() => {
+    //         float add = 1 + 1;
+    //         Debug.Log($"{add}");
+    //     });
 
 
-        //Return value
-        FloatTesting(x =>
-        {   
-            Debug.Log(x);
-            if (x < 4) return 3;
-            else return 5;
-        }, 2.0f);
-        int one = 24;
-        string j = "j";
+    //     //Return value
+    //     FloatTesting(x =>
+    //     {   
+    //         Debug.Log(x);
+    //         if (x < 4) return 3;
+    //         else return 5;
+    //     }, 2.0f);
+    //     int one = 24;
+    //     string j = "j";
 
-        OnVoidParam onVoid = (someInt, someString) => 
-        {   
-            Debug.Log($"int: {someInt} somestring: {someString} num: {one} name:{j} using void with param");
-        };
+    //     OnVoidParam onVoid = (someInt, someString) => 
+    //     {   
+    //         Debug.Log($"int: {someInt} somestring: {someString} num: {one} name:{j} using void with param");
+    //     };
 
-        VoidWithParam(onVoid);
-    }
+    //     VoidWithParam(onVoid);
+    // }
 
 }

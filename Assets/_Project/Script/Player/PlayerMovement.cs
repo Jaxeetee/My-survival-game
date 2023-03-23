@@ -5,8 +5,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]
-    private InputActionAsset _asset;
 
     [SerializeField]
     private float _playerNormalSpeed = 5.0f;
@@ -15,6 +13,11 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("The closer to 0, the slippier the feel")]
     private float _smoothMovementMultiplier = 7.0f;
     private float _smoothMovementSpeed = 0f;
+
+    public float playerMovementSpeed{
+        get => _playerMovementSpeed;
+        set => _playerMovementSpeed = value;
+    }
     private Vector3 _smoothMovement;
 
     [Header("Slope Handler Variables")]
@@ -27,19 +30,29 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
 
+#region --- SPRINT ---
+    [SerializeField, Tooltip("")]
+    private float _sprintSpeedMultiplier;
+
+#endregion
+
 #region --- CROUCH ---
 
-    [SerializeField]
-    private float _crouchSpeed;
+    [SerializeField, Tooltip("Measured in percentage of a player Normal Speed. So if it is set to 25%, crouch speed will be 25% of the normal Speed")]
+    [Range(0f,100f)]
+    private float _crouchSpeed = 50;
     private float _inputCrouch;
+
+    private bool _isCrouching;
 #endregion
 
 #region --- JUMP ---
-    [SerializeField]
+    [SerializeField, Range(5f,100f)]
     private float _jumpForce;
-
     private float _inputJump;
-    #endregion
+    private bool _canJump;
+    private bool _toggleCrouch;
+#endregion
 
 #region --- INPUT ---
     private Vector3 _inputDirection; // gets the raw input direction
@@ -53,6 +66,11 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
     }
 
+    private void Update() {
+        Debug.Log($"current speed: {playerMovementSpeed}");
+        _canJump = IsGrounded();
+    }
+
     private void FixedUpdate()
     {
         MovePlayer();
@@ -60,6 +78,11 @@ public class PlayerMovement : MonoBehaviour
         Crouch();
 
         _rb.useGravity = !OnSlope(); // checks if player is not on a flat surface
+    }
+
+    private void OnDrawGizmos() 
+    {
+        Debug.DrawRay(transform.position, -transform.up * 0.8f, Color.red);
     }
 #endregion
 
@@ -100,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovePosition(Vector3 direction)
     {
         _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
-        _rb.MovePosition(transform.position + _smoothMovement * _playerNormalSpeed * Time.deltaTime);
+        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
     }
 
     private bool OnSlope()
@@ -129,8 +152,27 @@ public class PlayerMovement : MonoBehaviour
     {
         // TODO: Make player movement Slower
 
-        if (_inputCrouch == 0) return; // meaning if it is not pressed 
-        _playerMovementSpeed = _crouchSpeed;
+        if (!_isCrouching)
+        {
+            _playerMovementSpeed = _playerNormalSpeed;
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * 8f);
+        }
+        else 
+        {
+            _playerMovementSpeed =  (_crouchSpeed/100) * _playerNormalSpeed;
+            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(1f, 0.5f, 1f), Time.deltaTime * 8f);
+        }
+            
+    }
+
+    public void UpdateToggle(bool value)
+    {
+        _toggleCrouch = value;
+
+        if (_toggleCrouch)
+        {
+            _isCrouching = !_isCrouching;
+        }
     }
 #endregion
 
@@ -141,7 +183,22 @@ public class PlayerMovement : MonoBehaviour
         // TODO: AddForce();
         if (_inputJump == 0) return;
 
-        _rb.AddForce(transform.up * _jumpForce);
+        if (!_canJump) return;
+
+        if (!_isCrouching)
+            _rb.AddForce(transform.up * _jumpForce);
+        else{
+            //make the player stand
+            _isCrouching = false;
+        }
+        
+    }
+
+    private bool IsGrounded()
+    {
+        var onGround = Physics.Raycast(transform.position + new Vector3(0f, 0.5f, 0f), -transform.up,0.8f);
+        Debug.Log($"Ground Checker Called! value is: {onGround}");
+        return onGround;
     }
 
 #endregion
