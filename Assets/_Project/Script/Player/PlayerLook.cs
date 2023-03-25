@@ -17,6 +17,29 @@ using UnityEngine.InputSystem;
 
         private float _xRotation = 0f;
 
+
+#region --- NEW VARS ---
+
+        [SerializeField, Range(0.1f, 10f)]
+        private float _mouseSensitivity;
+
+        [SerializeField, Range(0.01f, 0.5f)]
+        private float _smoothness = 0.05f;
+
+        [SerializeField, Range(10f,90f)]
+        private float _maxVerticalAngle = 75f;
+
+        [SerializeField, Range(-90f, -10f)]
+        private float _minVerticalAngle = -75f;
+
+        private Vector2 _lookInput;
+        private Vector2 _smoothLook;
+
+        private float _verticalClamp;
+
+#endregion
+
+
         [SerializeField]
         private PlayerController _playerController;
 
@@ -34,22 +57,34 @@ using UnityEngine.InputSystem;
             _playerController.onRawMouseInputDeltaChange -= GetMouseDelta;
         }
 
-        void Update()
+
+        // had to change to fixedupdate to prevent from Jitter-ness of mouse look
+        void FixedUpdate()
         {
-           
+            _lookInput *= _mouseSensitivity * Time.deltaTime;
+            _lookInput.y = Mathf.Clamp(_lookInput.y, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
 
-            _xRotation -= _mouseInputY * _mouseSensitivityY * Time.deltaTime;
-            _xRotation = Mathf.Clamp(_xRotation, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
-            transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+            
+            _smoothLook = Vector2.Lerp(_smoothLook, _lookInput, _smoothness);
+            Debug.Log($"smooth look value at x axis: {_smoothLook.x}");
 
-            //player body rotation
-            _player.Rotate(Vector3.up * _mouseInputX * _mouseSensitivityX * Time.deltaTime);
+            _verticalClamp = Mathf.Clamp(_verticalClamp - _smoothLook.y, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
+            transform.localRotation = Quaternion.Euler(_verticalClamp, 0f, 0f);
+            
+
+            _player.Rotate(Vector3.up * _smoothLook.x);
+
+            // _xRotation -= _mouseInputY * _mouseSensitivityY * Time.deltaTime;
+            // _xRotation = Mathf.Clamp(_xRotation, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
+            // transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+
+            // //player body rotation
+            // _player.Rotate(Vector3.up * _mouseInputX * _mouseSensitivityX * Time.deltaTime);
         }
 
         private void GetMouseDelta(Vector2 delta)
         {
-            _mouseInputX = delta.x;
-            _mouseInputY = delta.y;
+           _lookInput = delta;
         }
     }
 
