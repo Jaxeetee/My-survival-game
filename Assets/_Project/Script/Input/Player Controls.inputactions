@@ -43,12 +43,12 @@
                 },
                 {
                     "name": "Crouch",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "8d9e5f37-8638-4f8d-880c-bc9c997dab95",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Digital",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [

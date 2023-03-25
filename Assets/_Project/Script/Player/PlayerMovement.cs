@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     private float _playerMovementSpeed;
+    
     private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
 
@@ -56,6 +57,9 @@ public class PlayerMovement : MonoBehaviour
 
 #region --- INPUT ---
     private Vector3 _inputDirection; // gets the raw input direction
+
+    [SerializeField]
+    private PlayerController _playerController;
 #endregion   
 
 
@@ -64,6 +68,20 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+    }
+
+    private void OnEnable()
+    {
+        _playerController.onRawMovementInputAxisChange += UpdateInputMovementValue;
+        _playerController.onCrouchInputValueChange += UpdateInputCrouchValue;
+        _playerController.onJumpInputValueChange += UpdateInputJumpValue;
+    }
+
+    private void OnDisable()
+    {
+        _playerController.onRawMovementInputAxisChange -= UpdateInputMovementValue;
+        _playerController.onCrouchInputValueChange -= UpdateInputCrouchValue;
+        _playerController.onJumpInputValueChange -= UpdateInputJumpValue;
     }
 
     private void Update() {
@@ -139,7 +157,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 GetSlopeDirection()
     {
         Vector3 angledGround = Vector3.ProjectOnPlane(_movementDirection, _slopeHit.normal);
-        Debug.Log($"Angled ground: {angledGround}");
         return angledGround;
     }
 
@@ -197,24 +214,23 @@ public class PlayerMovement : MonoBehaviour
     private bool IsGrounded()
     {
         var onGround = Physics.Raycast(transform.position + new Vector3(0f, 0.5f, 0f), -transform.up,0.8f);
-        Debug.Log($"Ground Checker Called! value is: {onGround}");
         return onGround;
     }
 
 #endregion
 
 #region -= INPUT =-
-    public void UpdateInputMovementValue(Vector3 value)
+    private void UpdateInputMovementValue(Vector3 value)
     {
         _inputDirection = value;
     }
 
-    public void UpdateInputCrouchValue(float value)
+    private void UpdateInputCrouchValue(float value)
     {
         _inputCrouch = value;
     }
 
-    public void UpdateInputJumpValue(float value)
+    private void UpdateInputJumpValue(float value)
     {
         _inputJump = value;
     }

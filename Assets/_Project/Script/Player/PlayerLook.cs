@@ -17,18 +17,21 @@ using UnityEngine.InputSystem;
 
         private float _xRotation = 0f;
 
+        [SerializeField]
+        private PlayerController _playerController;
+
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
         private void OnEnable()
         {
- 
+            _playerController.onRawMouseInputDeltaChange += GetMouseDelta;
         }
 
         private void OnDisable()
         {
-
+            _playerController.onRawMouseInputDeltaChange -= GetMouseDelta;
         }
 
         void Update()
@@ -43,7 +46,7 @@ using UnityEngine.InputSystem;
             _player.Rotate(Vector3.up * _mouseInputX * _mouseSensitivityX * Time.deltaTime);
         }
 
-        public void GetMouseDelta(Vector2 delta)
+        private void GetMouseDelta(Vector2 delta)
         {
             _mouseInputX = delta.x;
             _mouseInputY = delta.y;

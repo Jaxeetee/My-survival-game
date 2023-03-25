@@ -616,7 +616,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27536
+  m_Name: pb_Mesh27566
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2603,6 +2603,7 @@ MonoBehaviour:
   _mouseSensitivityY: 5
   _player: {fileID: 1774504536}
   _maxAngleAlongYAxis: 75
+  _playerController: {fileID: 1774504539}
 --- !u!4 &1530587723
 Transform:
   m_ObjectHideFlags: 0
@@ -2932,7 +2933,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1774504538
@@ -3011,8 +3012,11 @@ MonoBehaviour:
   _playerNormalSpeed: 5
   _smoothMovementMultiplier: 7
   _maxSlope: 75
+  _rb: {fileID: 0}
+  _sprintSpeedMultiplier: 0
   _crouchSpeed: 50
   _jumpForce: 35
+  _playerController: {fileID: 1774504539}
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3463,6 +3467,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1774504536}
     m_Modifications:
+    - target: {fileID: 3015367821223390037, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3592489952284899948, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140005596750767494, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5809109905105318372, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -3506,6 +3522,18 @@ PrefabInstance:
     - target: {fileID: 5809109905105318372, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5904096004945215849, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6044157566253801867, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6311499017495197493, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6617417341081824094, guid: 48e63a02c137f4b48b53f2cee6c42433, type: 3}
       propertyPath: m_Name

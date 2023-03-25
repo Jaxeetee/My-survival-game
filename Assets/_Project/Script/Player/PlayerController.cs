@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
+
+
+//TODO Jump, Crouch, Look, Sprint 
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
@@ -14,21 +18,54 @@ public class PlayerController : MonoBehaviour
 
 
     private Vector3 _rawMovementInputAxis;
+
+    public event Action<Vector3> onRawMovementInputAxisChange;
+    public Vector3 rawMovementInputAxis { 
+        get => _rawMovementInputAxis; 
+        private set {
+            _rawMovementInputAxis = value;
+        } 
+    }
+
     private Vector3 _smoothInputMovement;
 #endregion
 
 #region --- LOOK ---
-    [Header("Look")]
     private Vector2 _rawMouseInputDelta;
+    public event Action<Vector2> onRawMouseInputDeltaChange;
+    public Vector2 rawMouseInputDelta{
+        get => _rawMouseInputDelta;
+        private set {
+            _rawMouseInputDelta = value;
+        }
+    }
 #endregion
 
 #region --- JUMP ---
     private float _jumpInputValue;
+
+    public event Action<float> onJumpInputValueChange;
+    public float jumpInputValue{
+        get => _jumpInputValue;
+        private set {
+            _jumpInputValue = value;
+        }
+    }
 #endregion
 
 #region --- CROUCH ---
     private float _crouchInputValue;
+
+    public event Action<float> onCrouchInputValueChange;
+    public float crouchInputValue { 
+        get => _crouchInputValue; 
+        private set {
+            _crouchInputValue = value;
+        } 
+    }
     private bool _didPress = false;
+
+
 #endregion
 
 #region --- REFERENCE PLAYER SCRIPTS ---
@@ -72,29 +109,10 @@ public class PlayerController : MonoBehaviour
         _smoothInputMovement = Vector3.Lerp(_smoothInputMovement, _rawMovementInputAxis, Time.deltaTime * _movementSmoothingSpeed);
     }
 
-    private void UpdatePlayerJumpInput()
-    {
-        _playerMovementScript.UpdateInputJumpValue(_jumpInputValue);
-    }
-
-    private void UpdatePlayerCrouchInput()
-    {
-        _playerMovementScript.UpdateInputCrouchValue(_crouchInputValue);  
-    }
 
     private void UpdateToggle(bool value)
     {
         _playerMovementScript.UpdateToggle(value);
-    }
-
-    private void UpdatePlayerMovementInputs()
-    {
-        _playerMovementScript.UpdateInputMovementValue(_rawMovementInputAxis);
-    }
-
-    private void UpdatePlayerLookInputs()
-    {
-        _playerLookScript.GetMouseDelta(_rawMouseInputDelta);
     }
 
     #region -= Unity Functions =- 
@@ -131,10 +149,6 @@ public class PlayerController : MonoBehaviour
 
         #region -= PLAYER INPUT UPDATE =-
         //? Contemplating to change to remove this since this will be restricted to a Player Input Component anyways
-        UpdatePlayerMovementInputs();
-        UpdatePlayerCrouchInput();
-        UpdatePlayerJumpInput();
-        UpdatePlayerLookInputs();
         #endregion
     }
     #endregion
@@ -145,17 +159,20 @@ public class PlayerController : MonoBehaviour
     private void OnMovement(InputAction.CallbackContext ctx)
     {
         Vector2 inputAxis = ctx.ReadValue<Vector2>();
-        _rawMovementInputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
+        rawMovementInputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
+        onRawMovementInputAxisChange?.Invoke(rawMovementInputAxis);
     }
 
     private void OnLook(InputAction.CallbackContext ctx)
     {
         _rawMouseInputDelta = ctx.ReadValue<Vector2>();
+        onRawMouseInputDeltaChange?.Invoke(_rawMouseInputDelta);
     }
 
     private void OnJump(InputAction.CallbackContext ctx)
     {
         _jumpInputValue = ctx.ReadValue<float>();
+        onJumpInputValueChange?.Invoke(_jumpInputValue);
     }
 
 
@@ -164,6 +181,7 @@ public class PlayerController : MonoBehaviour
         if (!_didPress)
         {
             _crouchInputValue = ctx.ReadValue<float>();
+            onCrouchInputValueChange?.Invoke(_crouchInputValue);
             _didPress = true;
             Debug.Log($"did press {_didPress}");
             UpdateToggle(_didPress);
