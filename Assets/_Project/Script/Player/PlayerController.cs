@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
         get => _rawMovementInputAxis; 
         private set {
             _rawMovementInputAxis = value;
+            onRawMovementInputAxisChange?.Invoke(rawMovementInputAxis);
         } 
     }
 
@@ -37,6 +38,7 @@ public class PlayerController : MonoBehaviour
         get => _rawMouseInputDelta;
         private set {
             _rawMouseInputDelta = value;
+            onRawMouseInputDeltaChange?.Invoke(rawMouseInputDelta);
         }
     }
 #endregion
@@ -49,6 +51,7 @@ public class PlayerController : MonoBehaviour
         get => _jumpInputValue;
         private set {
             _jumpInputValue = value;
+            onJumpInputValueChange?.Invoke(jumpInputValue);
         }
     }
 #endregion
@@ -61,24 +64,38 @@ public class PlayerController : MonoBehaviour
         get => _crouchInputValue; 
         private set {
             _crouchInputValue = value;
+            onCrouchInputValueChange?.Invoke(crouchInputValue);
         } 
     }
-    private bool _didPress = false;
+
+    public event Action<bool> onToggleCrouchChange;
+
+    private bool _didToggleCrouch = false;
+
+    public bool didToggleCrouch {
+        get => _didToggleCrouch;
+        private set{
+            _didToggleCrouch = value;
+            onToggleCrouchChange?.Invoke(didToggleCrouch);
+        }
+    }
 
 
 #endregion
 
-#region --- REFERENCE PLAYER SCRIPTS ---
-    [Space]
-    [Header("Reference Player Scripts")]
+#region --- SPRINT ---
 
-    [SerializeField]
-    private PlayerMovement _playerMovementScript;
+    public event Action<float> onSprintInputValueChange;
+    private float _sprintInputValue;
 
-    [SerializeField]
-    private PlayerLook _playerLookScript;
+    public float sprintInputValue{
+        get => _sprintInputValue;
+        private set {
+            _sprintInputValue = value;
+            onSprintInputValueChange?.Invoke(sprintInputValue);
+        }
+    }
 #endregion
-
     private PlayerInput _playerInput;
 
 
@@ -86,36 +103,30 @@ public class PlayerController : MonoBehaviour
     // has to subscribe on Update() as Player Input is doing something OnEnable() and will cause errors if subscribed OnEnable()
     private void PlayerInputInit()
     {
-        if (_playerInput.defaultActionMap != "Gameplay") return;
+        if (_playerInput.defaultActionMap != "Gameplay") return; //checks the default map first so it won't produce any error
+
         // ground movement
         _playerInput.actions["Movement"].performed += OnMovement;
         _playerInput.actions["Movement"].canceled += OnMovement;
 
         // player jump
-        _playerInput.actions["Jump"].started += OnJump;
+        _playerInput.actions["Jump"].performed += OnJump;
         _playerInput.actions["Jump"].canceled += OnJump;
 
         // player crouch
-         _playerInput.actions["Crouch"].started += OnCrouchPressed;
+         _playerInput.actions["Crouch"].performed += OnCrouchPressed;
          _playerInput.actions["Crouch"].canceled += OnCrouchRelease;
 
         // player Look
         _playerInput.actions["Look"].performed += OnLook;
         _playerInput.actions["Look"].canceled += OnLook;
+
+        // player sprinting
+        _playerInput.actions["Sprint"].performed += OnSprint;
+        _playerInput.actions["Sprint"].canceled += OnSprint;
     }
 
-    private void CalculateMovementInputSmoothing()
-    {
-        _smoothInputMovement = Vector3.Lerp(_smoothInputMovement, _rawMovementInputAxis, Time.deltaTime * _movementSmoothingSpeed);
-    }
-
-
-    private void UpdateToggle(bool value)
-    {
-        _playerMovementScript.UpdateToggle(value);
-    }
-
-    #region -= Unity Functions =- 
+#region -= Unity Functions =- 
     private void Awake() 
     {
         _playerInput = GetComponent<PlayerInput>();
@@ -127,7 +138,7 @@ public class PlayerController : MonoBehaviour
         _playerInput.actions["Movement"].performed -= OnMovement;
         _playerInput.actions["Movement"].canceled -= OnMovement;
 
-        _playerInput.actions["Jump"].started -= OnJump;
+        _playerInput.actions["Jump"].performed -= OnJump;
         _playerInput.actions["Jump"].canceled -= OnJump;
 
         _playerInput.actions["Crouch"].performed -= OnCrouchPressed;
@@ -135,64 +146,62 @@ public class PlayerController : MonoBehaviour
         
         _playerInput.actions["Look"].performed -= OnLook;
         _playerInput.actions["Look"].canceled -= OnLook;
+
+        _playerInput.actions["Sprint"].performed -= OnSprint;
+        _playerInput.actions["Sprint"].canceled -= OnSprint;
     }
 
     void Update()
     {
-        if (_playerInput != null)
-        {
+        if (_playerInput != null){
             PlayerInputInit();
-        }else{
+        }
+        else{
             Debug.LogError("Cannot detect PlayerInput. Will stop now");
             return;
         }
-
-        #region -= PLAYER INPUT UPDATE =-
-        //? Contemplating to change to remove this since this will be restricted to a Player Input Component anyways
-        #endregion
     }
-    #endregion
+#endregion
 
 
-    #region -= PlayerInput Events =- 
-
+#region -= PLAYEREVENT =- 
     private void OnMovement(InputAction.CallbackContext ctx)
     {
         Vector2 inputAxis = ctx.ReadValue<Vector2>();
         rawMovementInputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
-        onRawMovementInputAxisChange?.Invoke(rawMovementInputAxis);
+        
     }
 
     private void OnLook(InputAction.CallbackContext ctx)
     {
-        _rawMouseInputDelta = ctx.ReadValue<Vector2>();
-        onRawMouseInputDeltaChange?.Invoke(_rawMouseInputDelta);
+        rawMouseInputDelta = ctx.ReadValue<Vector2>();
+
     }
 
     private void OnJump(InputAction.CallbackContext ctx)
     {
-        _jumpInputValue = ctx.ReadValue<float>();
-        onJumpInputValueChange?.Invoke(_jumpInputValue);
+        jumpInputValue = ctx.ReadValue<float>();
     }
 
 
     private void OnCrouchPressed(InputAction.CallbackContext ctx)
     {
-        if (!_didPress)
-        {
-            _crouchInputValue = ctx.ReadValue<float>();
-            onCrouchInputValueChange?.Invoke(_crouchInputValue);
-            _didPress = true;
-            Debug.Log($"did press {_didPress}");
-            UpdateToggle(_didPress);
+        if (!_didToggleCrouch){
+            crouchInputValue = ctx.ReadValue<float>();
+
+            didToggleCrouch = true;
+            Debug.Log($"did press {didToggleCrouch}");
         }
-        
     }
 
     private void OnCrouchRelease(InputAction.CallbackContext ctx)
     {
-        _didPress = false;
+        didToggleCrouch = false;
     }
 
-    #endregion
+    private void OnSprint(InputAction.CallbackContext ctx)
+    {
+        sprintInputValue = ctx.ReadValue<float>();
+    }
+#endregion
 }

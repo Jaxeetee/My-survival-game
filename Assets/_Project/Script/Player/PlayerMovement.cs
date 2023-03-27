@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+#region --- PLAYER MOVEMENT ---
 
     [SerializeField]
     private float _playerNormalSpeed = 5.0f;
@@ -31,9 +34,13 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rb; 
     private Vector3 _movementDirection; //gets the movement direction of the player
 
+#endregion
+
+
 #region --- SPRINT ---
-    [SerializeField, Tooltip("")]
+    [SerializeField, Tooltip("when player is sprinting.")]
     private float _sprintSpeedMultiplier;
+    private float _sprintInput;
 
 #endregion
 
@@ -72,16 +79,25 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnEnable()
     {
+#region -= SUBSCRIBE TO PLAYER CONTROLLER =-
         _playerController.onRawMovementInputAxisChange += UpdateInputMovementValue;
         _playerController.onCrouchInputValueChange += UpdateInputCrouchValue;
         _playerController.onJumpInputValueChange += UpdateInputJumpValue;
+        _playerController.onToggleCrouchChange += UpdateCrouchToggle;
+        _playerController.onSprintInputValueChange += UpdateInputSpringValue;
+#endregion
     }
+
 
     private void OnDisable()
     {
+#region -= UNSUBSCRIBE TO PLAYER CONTROLLER =- 
         _playerController.onRawMovementInputAxisChange -= UpdateInputMovementValue;
         _playerController.onCrouchInputValueChange -= UpdateInputCrouchValue;
         _playerController.onJumpInputValueChange -= UpdateInputJumpValue;
+        _playerController.onToggleCrouchChange -= UpdateCrouchToggle;
+        _playerController.onSprintInputValueChange -= UpdateInputSpringValue;
+#endregion
     }
 
     private void Update() {
@@ -140,14 +156,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePosition(Vector3 direction)
     {
+        _playerMovementSpeed = IsSprinting()? _playerNormalSpeed * _sprintSpeedMultiplier: _playerNormalSpeed;
         _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
         _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
     }
 
     private bool OnSlope()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, 2f))
-        {
+        if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, 2f)) {
             float angle = Vector3.Angle(Vector3.up, _slopeHit.normal);
             return angle < _maxSlope && angle != 0;
         }
@@ -161,13 +177,24 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    private delegate bool SpeedCondition();
+    // changes speed depending on the movement state of the player.
+    private float ChangePlayerMovementValue(SpeedCondition condition, float changeTo) 
+    {
+        float speed = 0f;
+        if (condition.Invoke()){
+            speed = changeTo;
+        }
+        return speed;
+    }
+
+
 #endregion
 
 #region -= CROUCH & SLIDE =-
 
     private void Crouch()
     {
-        // TODO: Make player movement Slower
 
         if (!_isCrouching)
         {
@@ -176,21 +203,14 @@ public class PlayerMovement : MonoBehaviour
         }
         else 
         {
-            _playerMovementSpeed =  (_crouchSpeed/100) * _playerNormalSpeed;
+            float crouchSpeed = (_crouchSpeed/100) * _playerNormalSpeed;
+            _playerMovementSpeed = crouchSpeed;
             transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(1f, 0.5f, 1f), Time.deltaTime * 8f);
         }
             
     }
 
-    public void UpdateToggle(bool value)
-    {
-        _toggleCrouch = value;
 
-        if (_toggleCrouch)
-        {
-            _isCrouching = !_isCrouching;
-        }
-    }
 #endregion
 
 #region -= JUMP =-
@@ -219,10 +239,27 @@ public class PlayerMovement : MonoBehaviour
 
 #endregion
 
+#region -= SPRINT =-
+    private void UpdateInputSpringValue(float value)
+    {
+        _sprintInput = value;
+    }
+
+    private bool IsSprinting()
+    {
+        return _sprintInput > 0;
+    }
+#endregion    
+
 #region -= INPUT =-
     private void UpdateInputMovementValue(Vector3 value)
     {
         _inputDirection = value;
+    }
+
+    private void UpdateInputJumpValue(float value)
+    {
+        _inputJump = value;
     }
 
     private void UpdateInputCrouchValue(float value)
@@ -230,9 +267,13 @@ public class PlayerMovement : MonoBehaviour
         _inputCrouch = value;
     }
 
-    private void UpdateInputJumpValue(float value)
+    private void UpdateCrouchToggle(bool value)
     {
-        _inputJump = value;
+        _toggleCrouch = value;
+
+        if (_toggleCrouch) {
+            _isCrouching = !_isCrouching;
+        }
     }
 
 #endregion
