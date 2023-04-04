@@ -2999,8 +2999,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _movementSmoothingSpeed: 9
-  _playerMovementScript: {fileID: 1774504540}
-  _playerLookScript: {fileID: 1530587722}
 --- !u!114 &1774504540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3016,7 +3014,7 @@ MonoBehaviour:
   _playerNormalSpeed: 5
   _smoothMovementMultiplier: 7
   _maxSlope: 75
-  _sprintSpeedMultiplier: 0
+  _sprintSpeedMultiplier: 2
   _crouchSpeed: 50
   _jumpForce: 35
   _playerController: {fileID: 1774504539}

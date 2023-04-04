@@ -1,0 +1,16 @@
+Using UnityEngine;
+
+
+public class #SCRIPTNAME# : Objective
+{
+    protected override void InitializeObjective()
+    {
+        
+    }
+
+    
+    protected override void Goal()
+    {
+        
+    }
+}
