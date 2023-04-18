@@ -1,4 +1,4 @@
-Using UnityEngine;
+using UnityEngine;
 
 
 public class #SCRIPTNAME# : Objective

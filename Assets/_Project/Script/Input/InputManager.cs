@@ -10,6 +10,11 @@ public class InputManager : Singleton<InputManager>
     //Enable and Disable Action Maps
     //Invert controls
 
-    
+
+    private void OnEnable()
+    {
+        
+    }
+     
 
 }
