@@ -132,6 +132,19 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
     }
 
+    private void Start()
+    {
+        if (_playerInput != null)
+        {
+            PlayerInputInit();
+        }
+        else
+        {
+            Debug.LogError("Cannot detect PlayerInput");
+            return;
+        }
+    }
+
 
     private void OnDisable() 
     {
@@ -151,16 +164,6 @@ public class PlayerController : MonoBehaviour
         _playerInput.actions["Sprint"].canceled -= OnSprint;
     }
 
-    void Update()
-    {
-        if (_playerInput != null){
-            PlayerInputInit();
-        }
-        else{
-            Debug.LogError("Cannot detect PlayerInput. Will stop now");
-            return;
-        }
-    }
 #endregion
 
 
@@ -168,14 +171,12 @@ public class PlayerController : MonoBehaviour
     private void OnMovement(InputAction.CallbackContext ctx)
     {
         Vector2 inputAxis = ctx.ReadValue<Vector2>();
-        rawMovementInputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
-        
+        rawMovementInputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);    
     }
 
     private void OnLook(InputAction.CallbackContext ctx)
     {
         rawMouseInputDelta = ctx.ReadValue<Vector2>();
-
     }
 
     private void OnJump(InputAction.CallbackContext ctx)
