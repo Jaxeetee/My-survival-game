@@ -20,6 +20,11 @@ namespace WeaponSystem
         [SerializeField] public TrailConfigurationScriptableObject TrailConfiguration { get; private set; }
 
 
+        // Must contain the Following
+        // - Shoot()
+        // - Reload()
+        // - Is Using Projectile or Hitscan()
+        // - Has Different Firemodes
 
     }
 }
