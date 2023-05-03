@@ -11,7 +11,6 @@ namespace PlayerSystem
 
         public float currentMovementSpeed { get; private set; }
 
-
         [Space(20)]
         [Header("Slope Properties")]
         [SerializeField, Range(0f, 90f)]
@@ -32,6 +31,17 @@ namespace PlayerSystem
         [SerializeField, Range(1.01f, 5f)]
         private float _staminaDropOffMultiplier;
 
+        #region === UNITY FUNCS ===
+        private void OnEnable()
+        {
+            
+        }
+
+        private void OnDisable()
+        {
+            
+        }
+        #endregion
 
         #region === INPUT GETTER ===
 
