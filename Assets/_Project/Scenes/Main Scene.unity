@@ -616,7 +616,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27570
+  m_Name: pb_Mesh27574
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2886,6 +2886,7 @@ GameObject:
   - component: {fileID: 1774504538}
   - component: {fileID: 1774504539}
   - component: {fileID: 1774504540}
+  - component: {fileID: 1774504541}
   m_Layer: 0
   m_Name: = PLAYER =
   m_TagString: Untagged
@@ -3011,13 +3012,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfdaf15c0e22184b87466a83fb37427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerNormalSpeed: 5
-  _smoothMovementMultiplier: 7
-  _maxSlope: 75
-  _sprintSpeedMultiplier: 2
-  _crouchSpeed: 50
-  _jumpForce: 35
-  _playerController: {fileID: 1774504539}
+  _movementSpeed: 0
+  _maxSlopeAngleWalkable: 0
+  _sprintSpeedMultiplier: 0
+  _maxStamina: 0
+  _staminaDropOffMultiplier: 0
+--- !u!114 &1774504541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774504534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b0ca5424d8ff294398578755e2a3e50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0

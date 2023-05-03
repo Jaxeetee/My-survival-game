@@ -58,6 +58,29 @@ namespace PlayerSystem
         {
             _inputHandler.onRawGroundMovementInput -= UpdateInputMovementDirection;
         }
+
+        private void Update()
+        {
+            
+        }
+
+        private void FixedUpdate()
+        {
+            
+        }
+        #endregion
+
+        #region === DIRECTION FUNC ===
+        private Vector3 GetFrontDirection()
+        {
+            var forward = transform.forward;
+            var right = transform.right;
+
+            Vector3 front = _inputMovementDirection.x * right + _inputMovementDirection.z * forward;
+
+            return front;
+        }
+
         #endregion
 
         #region === INPUT GETTER ===
