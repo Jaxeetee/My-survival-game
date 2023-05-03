@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 
 
@@ -12,16 +11,10 @@ public class AnimationHandler : MonoBehaviour
 {
     private static Animator _animator;
 
-    #region === ANIMATOR STRING HASH ===
-
-    private int isRunningHash = Animator.StringToHash("isRunning");
-
-    #endregion
     //use Animator.StringToHash("name of the animation") to call the animation
     private void Awake()
     {
         _animator = GetComponent<Animator>();
-
     }
     
     public static void SetBool(string animParam,  bool value)
