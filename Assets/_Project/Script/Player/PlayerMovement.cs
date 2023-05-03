@@ -1,13 +1,19 @@
 using UnityEngine;
 using System;
-using Unity.VisualScripting.Dependencies.Sqlite;
 
 namespace PlayerSystem
 {
     public class PlayerMovement : MonoBehaviour
     {
+        private InputHandler _inputHandler;
+
+        #region === PLAYER MOVEMENT VAR ===
         [SerializeField]
         private float _movementSpeed;
+
+        private Vector3 _inputMovementDirection;
+
+        private Rigidbody _rb;
 
         public float currentMovementSpeed { get; private set; }
 
@@ -17,34 +23,48 @@ namespace PlayerSystem
         private float _maxSlopeAngleWalkable;
 
         private RaycastHit _slopeHit;
+        #endregion
 
+
+        #region === SPRINT VAR ===
         [Space(20)]
         [Header("Sprint Variables")]
         [Tooltip("Multiplies to _movementSpeed")]
         [SerializeField, Range(0f, 5f)]
         private float _sprintSpeedMultiplier;
 
-
         [SerializeField]
         private float _maxStamina;
         [Tooltip("Controls how fast the stamina drops")]
         [SerializeField, Range(1.01f, 5f)]
         private float _staminaDropOffMultiplier;
+        #endregion
+
 
         #region === UNITY FUNCS ===
+
+        private void Awake()
+        {
+            _rb = GetComponent<Rigidbody>();
+            _inputHandler = GetComponent<InputHandler>();
+        }
+
         private void OnEnable()
         {
-            
+            _inputHandler.onRawGroundMovementInput += UpdateInputMovementDirection;
         }
 
         private void OnDisable()
         {
-            
+            _inputHandler.onRawGroundMovementInput -= UpdateInputMovementDirection;
         }
         #endregion
 
         #region === INPUT GETTER ===
-
+        private void UpdateInputMovementDirection(Vector3 inputMovementDirection)
+        {
+            _inputMovementDirection = inputMovementDirection;
+        }
         #endregion
 
     }

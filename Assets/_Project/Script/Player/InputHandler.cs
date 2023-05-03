@@ -76,13 +76,13 @@ namespace PlayerSystem
 
         #region ==== GAMEPLAY ====
         //LOOK
-        public static event Action<Vector2> onRawMouseLookInput;
+        public event Action<Vector2> onRawMouseLookInput;
         //GROUND MOVEMENT
-        public static event Action<Vector2> onRawGroundMovementInput;
+        public event Action<Vector3> onRawGroundMovementInput;
         // CROUCH / SLIDE
-        public static event Action<float> onRawCrouchInput;
+        public event Action<float> onRawCrouchInput;
         // SPRINT
-        public static event Action<float> onRawSprintInput;
+        public event Action<float> onRawSprintInput;
 
         private void SubscribeGameplay()
         {
@@ -124,7 +124,8 @@ namespace PlayerSystem
         private void OnMovement(InputAction.CallbackContext obj)
         {
             Vector2 inputAxis = obj.ReadValue<Vector2>();
-            onRawGroundMovementInput(inputAxis);
+            Vector3 vector3InputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
+            onRawGroundMovementInput(vector3InputAxis);
         }
 
         private void OnLook(InputAction.CallbackContext obj)
