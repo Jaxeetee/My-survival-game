@@ -55,10 +55,6 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 #region --- JUMP ---
-    [SerializeField, Range(5f,100f)]
-    private float _jumpForce;
-    private float _inputJump;
-    private bool _canJump;
     private bool _toggleCrouch;
 #endregion
 
@@ -82,7 +78,6 @@ public class PlayerMovement : MonoBehaviour
 #region -= SUBSCRIBE TO PLAYER CONTROLLER =-
         _playerController.onRawMovementInputAxisChange += UpdateInputMovementValue;
         _playerController.onCrouchInputValueChange += UpdateInputCrouchValue;
-        _playerController.onJumpInputValueChange += UpdateInputJumpValue;
         _playerController.onToggleCrouchChange += UpdateCrouchToggle;
         _playerController.onSprintInputValueChange += UpdateInputSpringValue;
 #endregion
@@ -94,7 +89,6 @@ public class PlayerMovement : MonoBehaviour
 #region -= UNSUBSCRIBE TO PLAYER CONTROLLER =- 
         _playerController.onRawMovementInputAxisChange -= UpdateInputMovementValue;
         _playerController.onCrouchInputValueChange -= UpdateInputCrouchValue;
-        _playerController.onJumpInputValueChange -= UpdateInputJumpValue;
         _playerController.onToggleCrouchChange -= UpdateCrouchToggle;
         _playerController.onSprintInputValueChange -= UpdateInputSpringValue;
 #endregion
@@ -102,13 +96,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update() {
         Debug.Log($"current speed: {playerMovementSpeed}");
-        _canJump = IsGrounded();
     }
 
     private void FixedUpdate()
     {
         MovePlayer();
-        Jump();
         Crouch();
 
         _rb.useGravity = !OnSlope(); // checks if player is not on a flat surface
@@ -121,6 +113,7 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 #region -= GROUND MOVEMENT =-
+
 
     private void MovePlayer()
     {
@@ -143,6 +136,7 @@ public class PlayerMovement : MonoBehaviour
         }   
     }
     
+    //gets the front direction of the Player
     private Vector3 FrontDirection(Vector3 direction)
     {
         var forward = transform.forward;
@@ -215,22 +209,6 @@ public class PlayerMovement : MonoBehaviour
 
 #region -= JUMP =-
 
-    private void Jump()
-    {
-        // TODO: AddForce();
-        if (_inputJump == 0) return;
-
-        if (!_canJump) return;
-
-        if (!_isCrouching)
-            _rb.AddForce(transform.up * _jumpForce);
-        else{
-            //make the player stand
-            _isCrouching = false;
-        }
-        
-    }
-
     private bool IsGrounded()
     {
         var onGround = Physics.Raycast(transform.position + new Vector3(0f, 0.5f, 0f), -transform.up,0.8f);
@@ -255,11 +233,6 @@ public class PlayerMovement : MonoBehaviour
     private void UpdateInputMovementValue(Vector3 value)
     {
         _inputDirection = value;
-    }
-
-    private void UpdateInputJumpValue(float value)
-    {
-        _inputJump = value;
     }
 
     private void UpdateInputCrouchValue(float value)

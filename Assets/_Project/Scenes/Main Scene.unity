@@ -4515,8 +4515,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5329641439131881517}
   - component: {fileID: 5329641439131881518}
+  - component: {fileID: 5329641439131881519}
   m_Layer: 0
-  m_Name: PD_Idle
+  m_Name: Player Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4597,6 +4598,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &5329641439131881519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4809105573924047511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17d0fbd46e68b7b4f9ad691c08ebb8c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5370968343860019266
 GameObject:
   m_ObjectHideFlags: 0

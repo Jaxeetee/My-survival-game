@@ -43,19 +43,6 @@ public class PlayerController : MonoBehaviour
     }
 #endregion
 
-#region --- JUMP ---
-    private float _jumpInputValue;
-
-    public event Action<float> onJumpInputValueChange;
-    public float jumpInputValue{
-        get => _jumpInputValue;
-        private set {
-            _jumpInputValue = value;
-            onJumpInputValueChange?.Invoke(jumpInputValue);
-        }
-    }
-#endregion
-
 #region --- CROUCH ---
     private float _crouchInputValue;
 
@@ -100,7 +87,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    // has to subscribe on Update() as Player Input is doing something OnEnable() and will cause errors if subscribed OnEnable()
+    // has to subscribe on Start() as Player Input is doing something OnEnable() and will cause errors if subscribed OnEnable()
     private void PlayerInputInit()
     {
         if (_playerInput.defaultActionMap != "Gameplay") return; //checks the default map first so it won't produce any error
@@ -108,10 +95,6 @@ public class PlayerController : MonoBehaviour
         // ground movement
         _playerInput.actions["Movement"].performed += OnMovement;
         _playerInput.actions["Movement"].canceled += OnMovement;
-
-        // player jump
-        _playerInput.actions["Jump"].performed += OnJump;
-        _playerInput.actions["Jump"].canceled += OnJump;
 
         // player crouch
          _playerInput.actions["Crouch"].performed += OnCrouchPressed;
@@ -151,9 +134,6 @@ public class PlayerController : MonoBehaviour
         _playerInput.actions["Movement"].performed -= OnMovement;
         _playerInput.actions["Movement"].canceled -= OnMovement;
 
-        _playerInput.actions["Jump"].performed -= OnJump;
-        _playerInput.actions["Jump"].canceled -= OnJump;
-
         _playerInput.actions["Crouch"].performed -= OnCrouchPressed;
         _playerInput.actions["Crouch"].canceled -= OnCrouchRelease;
         
@@ -177,11 +157,6 @@ public class PlayerController : MonoBehaviour
     private void OnLook(InputAction.CallbackContext ctx)
     {
         rawMouseInputDelta = ctx.ReadValue<Vector2>();
-    }
-
-    private void OnJump(InputAction.CallbackContext ctx)
-    {
-        jumpInputValue = ctx.ReadValue<float>();
     }
 
 
