@@ -12,12 +12,27 @@ namespace PlayerSystem
     {
         private PlayerControls _playerControls;
 
-        public Dictionary<string, InputActionMap> actionMaps { get; private set; }
-
+        #region === UNITY FUNC ===
         private void Awake()
         {
-            _playerControls = GetComponent<PlayerControls>();
+            _playerControls = new PlayerControls();
         }
+
+        private void OnEnable()
+        {
+            SubscribeGameplay();
+            SubscribeMenu();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeGameplay();
+            UnsubscribeMenu();
+        }
+        #endregion
+
+        #region === ACTION MAP FUNC ===
+        public Dictionary<string, InputActionMap> actionMaps { get; private set; }
 
         // adds all mapNames in a Dictionary
         private void UpdateActionMapList()
@@ -55,21 +70,7 @@ namespace PlayerSystem
                 }
             }
         }
-
-        #region === UNITY FUNC ===
-        private void OnEnable()
-        {
-            SubscribeGameplay();
-            SubscribeMenu();
-        }
-
-        private void OnDisable()
-        {
-            UnsubscribeGameplay();
-            UnsubscribeMenu();
-        }
         #endregion
-
 
         #region === INPUT EVENTS ===
 
@@ -120,10 +121,16 @@ namespace PlayerSystem
         }
 
         #region ==== MOVEMENT FUNC ====
-        private void OnCrouch(InputAction.CallbackContext obj)
+        private void OnMovement(InputAction.CallbackContext obj)
         {
-            float inputPressed = obj.ReadValue<float>();
-            onRawCrouchInput?.Invoke(inputPressed);
+            Vector2 inputAxis = obj.ReadValue<Vector2>();
+            onRawGroundMovementInput(inputAxis);
+        }
+
+        private void OnLook(InputAction.CallbackContext obj)
+        {
+            Vector2 inputAxis = obj.ReadValue<Vector2>();
+            onRawMouseLookInput(inputAxis);
         }
 
         private void OnSprint(InputAction.CallbackContext obj)
@@ -132,16 +139,13 @@ namespace PlayerSystem
             onRawSprintInput?.Invoke(inputPressed);
         }
 
-        private void OnLook(InputAction.CallbackContext obj)
+        private void OnCrouch(InputAction.CallbackContext obj)
         {
-            Vector2 inputAxis = obj.ReadValue<Vector2>();
-            onRawMouseLookInput(inputAxis);
+            float inputPressed = obj.ReadValue<float>();
+            onRawCrouchInput?.Invoke(inputPressed);
         }
-        private void OnMovement(InputAction.CallbackContext obj)
-        {
-            Vector2 inputAxis = obj.ReadValue<Vector2>();
-            onRawGroundMovementInput(inputAxis);
-        }
+
+
         #endregion
 
         #region ==== COMBAT AND INTERACTION FUNC ====
