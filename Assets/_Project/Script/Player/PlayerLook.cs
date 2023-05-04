@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PlayerSystem.InputSystem;
 
-
+namespace PlayerSystem
+{
     public class PlayerLook : MonoBehaviour
     {
-        [SerializeField, Range (0.1f, 5.0f)] private float _mouseSensitivityX;
+        [SerializeField, Range(0.1f, 5.0f)] private float _mouseSensitivityX;
         private float _mouseInputX;
 
         [SerializeField, Range(0.1f, 5.0f)] private float _mouseSensitivityY;
@@ -18,7 +20,7 @@ using UnityEngine.InputSystem;
         private float _xRotation = 0f;
 
 
-#region --- NEW VARS ---
+        #region === MOUSE VARIABLES ===
 
         [SerializeField, Range(0.1f, 10f)]
         private float _mouseSensitivity;
@@ -26,7 +28,7 @@ using UnityEngine.InputSystem;
         [SerializeField, Range(0.01f, 0.5f)]
         private float _smoothness = 0.05f;
 
-        [SerializeField, Range(10f,90f)]
+        [SerializeField, Range(10f, 90f)]
         private float _maxVerticalAngle = 75f;
 
         [SerializeField, Range(-90f, -10f)]
@@ -37,11 +39,15 @@ using UnityEngine.InputSystem;
 
         private float _verticalClamp;
 
-#endregion
+        private InputHandler _inputHandler;
+
+        #endregion
 
 
-        [SerializeField]
-        private PlayerController _playerController;
+        private void Awake()
+        {
+            _inputHandler = GetComponentInParent<InputHandler>();
+        }
 
         private void Start()
         {
@@ -49,12 +55,12 @@ using UnityEngine.InputSystem;
         }
         private void OnEnable()
         {
-            _playerController.onRawMouseInputDeltaChange += GetMouseDelta;
+            _inputHandler.onRawMouseLookInput += GetMouseDelta;
         }
 
         private void OnDisable()
         {
-            _playerController.onRawMouseInputDeltaChange -= GetMouseDelta;
+            _inputHandler.onRawMouseLookInput -= GetMouseDelta;
         }
 
 
@@ -64,27 +70,19 @@ using UnityEngine.InputSystem;
             _lookInput *= _mouseSensitivity * Time.deltaTime;
             _lookInput.y = Mathf.Clamp(_lookInput.y, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
 
-            
+
             _smoothLook = Vector2.Lerp(_smoothLook, _lookInput, _smoothness);
 
             _verticalClamp = Mathf.Clamp(_verticalClamp - _smoothLook.y, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
             transform.localRotation = Quaternion.Euler(_verticalClamp, 0f, 0f);
-            
+
 
             _player.Rotate(Vector3.up * _smoothLook.x);
-
-            // _xRotation -= _mouseInputY * _mouseSensitivityY * Time.deltaTime;
-            // _xRotation = Mathf.Clamp(_xRotation, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
-            // transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
-
-            // //player body rotation
-            // _player.Rotate(Vector3.up * _mouseInputX * _mouseSensitivityX * Time.deltaTime);
         }
 
         private void GetMouseDelta(Vector2 delta)
         {
-           _lookInput = delta;
+            _lookInput = delta;
         }
     }
-
-
+}

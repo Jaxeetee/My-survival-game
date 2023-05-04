@@ -93,9 +93,7 @@ namespace PlayerSystem
 
             forward.y = right.y = 0f; // both forward and right y values will have a value of 0f
 
-            Vector3 front = _inputMovementDirection.x * right + _inputMovementDirection.z * forward;
-
-            return front;
+            return _inputMovementDirection.x * right + _inputMovementDirection.z * forward;
         }
 
         //This checks if the Player is on a valid slope
@@ -132,24 +130,6 @@ namespace PlayerSystem
                 return GetFrontDirection();
             }
         }
-        //    private void MovePlayer()
-        //    {
-        //        _movementDirection = FrontDirection(_inputDirection);
-        //        if (OnSlope())
-        //            MovePosition(GetSlopeDirection());
-        //            if (_rb.velocity.y > 0)
-        //                _rb.AddForce(Vector3.down * 80f, ForceMode.Force);
-        //        else
-        //            MovePosition(_movementDirection);
-        //    }
-
-        //    private void MovePosition(Vector3 direction)
-        //    {
-        //        _playerMovementSpeed = IsSprinting()? _playerNormalSpeed * _sprintSpeedMultiplier: _playerNormalSpeed;
-        //        _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
-        //        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
-        //    }
-
 
         #endregion
 

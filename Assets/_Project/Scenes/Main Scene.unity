@@ -2594,7 +2594,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1530587721}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b969c3e03534e174f895894d02db0236, type: 3}
   m_Name: 
@@ -2607,7 +2607,6 @@ MonoBehaviour:
   _smoothness: 0.5
   _maxVerticalAngle: 75
   _minVerticalAngle: -75
-  _playerController: {fileID: 0}
 --- !u!4 &1530587723
 Transform:
   m_ObjectHideFlags: 0
@@ -2968,7 +2967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b0ca5424d8ff294398578755e2a3e50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerInput: {fileID: -944628639613478452, guid: c287bfec7e71f074ea6b97471255a05e, type: 3}
+  _currentActionMapActive: 0
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0
