@@ -1,10 +1,13 @@
 using UnityEngine;
 using System;
 
+using PlayerSystem.InputSystem;
+
 namespace PlayerSystem
 {
     public class PlayerMovement : MonoBehaviour
     {
+
         private InputHandler _inputHandler;
 
         #region === PLAYER MOVEMENT VAR ===
@@ -13,6 +16,8 @@ namespace PlayerSystem
 
         private Vector3 _inputMovementDirection;
 
+        private Vector3 _direction;
+
         private Rigidbody _rb;
 
         public float currentMovementSpeed { get; private set; }
@@ -20,7 +25,7 @@ namespace PlayerSystem
         [Space(20)]
         [Header("Slope Properties")]
         [SerializeField, Range(0f, 90f)]
-        private float _maxSlopeAngleWalkable;
+        private float _maxSlopeAngleWalkable = 45.0f;
 
         private RaycastHit _slopeHit;
         #endregion
@@ -49,6 +54,10 @@ namespace PlayerSystem
             _inputHandler = GetComponent<InputHandler>();
         }
 
+        private void Start()
+        {
+        }
+
         private void OnEnable()
         {
             _inputHandler.onRawGroundMovementInput += UpdateInputMovementDirection;
@@ -66,7 +75,13 @@ namespace PlayerSystem
 
         private void FixedUpdate()
         {
+            _direction = GetMovementDirection();
+            // Debug.Log($"RB Velocity Magnitude: {_rb.velocity.magnitude}");
+
+            Debug.Log($"input movement: {_inputMovementDirection}");
             
+
+            _rb.MovePosition(transform.position + _direction * _movementSpeed * Time.deltaTime);
         }
         #endregion
 
@@ -76,10 +91,65 @@ namespace PlayerSystem
             var forward = transform.forward;
             var right = transform.right;
 
+            forward.y = right.y = 0f; // both forward and right y values will have a value of 0f
+
             Vector3 front = _inputMovementDirection.x * right + _inputMovementDirection.z * forward;
 
             return front;
         }
+
+        //This checks if the Player is on a valid slope
+        private bool OnWalkableSlope()
+        {
+            if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, 2f))
+            {
+                float angle = Vector3.Angle(Vector3.up, _slopeHit.normal);
+                return angle < _maxSlopeAngleWalkable && angle != 0f;
+            }
+            return false;
+        }
+
+        private Vector3 GetSlopeDirection()
+        {
+            Vector3 angledGround = Vector3.ProjectOnPlane(GetFrontDirection(), _slopeHit.normal);
+            return angledGround;
+        }
+
+        //this determines when to use the normal direction and the slope direction
+        private Vector3 GetMovementDirection()
+        {
+            if (OnWalkableSlope())
+            {
+                //To remove unecessary jump off of the player involving ramps especially when going down.
+                if (_rb.velocity.y > 0f)
+                {
+                    _rb.AddForce(Vector3.down * 80f, ForceMode.Force);
+                }
+                return GetSlopeDirection();
+            }
+            else
+            {
+                return GetFrontDirection();
+            }
+        }
+        //    private void MovePlayer()
+        //    {
+        //        _movementDirection = FrontDirection(_inputDirection);
+        //        if (OnSlope())
+        //            MovePosition(GetSlopeDirection());
+        //            if (_rb.velocity.y > 0)
+        //                _rb.AddForce(Vector3.down * 80f, ForceMode.Force);
+        //        else
+        //            MovePosition(_movementDirection);
+        //    }
+
+        //    private void MovePosition(Vector3 direction)
+        //    {
+        //        _playerMovementSpeed = IsSprinting()? _playerNormalSpeed * _sprintSpeedMultiplier: _playerNormalSpeed;
+        //        _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
+        //        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
+        //    }
+
 
         #endregion
 
@@ -180,17 +250,6 @@ namespace PlayerSystem
 //#endregion
 //    }
 
-
-//    private void OnDisable()
-//    {
-//#region -= UNSUBSCRIBE TO PLAYER CONTROLLER =- 
-//        _playerController.onRawMovementInputAxisChange -= UpdateInputMovementValue;
-//        _playerController.onCrouchInputValueChange -= UpdateInputCrouchValue;
-//        _playerController.onToggleCrouchChange -= UpdateCrouchToggle;
-//        _playerController.onSprintInputValueChange -= UpdateInputSpringValue;
-//#endregion
-//    }
-
 //    private void Update() {
 //        Debug.Log($"current speed: {playerMovementSpeed}");
 //    }
@@ -211,46 +270,6 @@ namespace PlayerSystem
 
 //#region -= GROUND MOVEMENT =-
 
-
-//    private void MovePlayer()
-//    {
-
-//        _movementDirection = FrontDirection(_inputDirection);
-
-
-//        if (OnSlope())
-//        {
-//            MovePosition(GetSlopeDirection());
-
-//            if (_rb.velocity.y > 0)
-//            {
-//                _rb.AddForce(Vector3.down * 80f, ForceMode.Force);
-//            }
-//        }
-//        else
-//        {
-//            MovePosition(_movementDirection);
-//        }   
-//    }
-
-//    //gets the front direction of the Player
-//    private Vector3 FrontDirection(Vector3 direction)
-//    {
-//        var forward = transform.forward;
-//        var right = transform.right;
-
-//        forward.y = 0f;
-//        right.y = 0f;
-
-//        return forward * direction.z + right * direction.x;
-//    }
-
-//    private void MovePosition(Vector3 direction)
-//    {
-//        _playerMovementSpeed = IsSprinting()? _playerNormalSpeed * _sprintSpeedMultiplier: _playerNormalSpeed;
-//        _smoothMovement = Vector3.Lerp(_smoothMovement, direction, Time.deltaTime * _smoothMovementMultiplier); // smoothens the 
-//        _rb.MovePosition(transform.position + _smoothMovement * _playerMovementSpeed * Time.deltaTime);
-//    }
 
 //    private bool OnSlope()
 //    {

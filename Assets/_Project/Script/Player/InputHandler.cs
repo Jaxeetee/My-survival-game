@@ -3,19 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace PlayerSystem
+namespace PlayerSystem.InputSystem
 {
     // Using the C# wrapper version. Won't use the PlayerInput Component since I find it lacking
-    // I'm more used to the C# wrapper version. 
-    // Must be attached to the player
+    // Must be attached to a GO where player inputs are needed.
+    // This means that it is not limited to the player character.
+
     public class InputHandler : MonoBehaviour
     {
-        private PlayerControls _playerControls;
+        private PlayerActionControls _playerInputs;
+
+        //This identifies what action map will be activated.
+        [SerializeField]
+        private ActionMapsType _currentActionMapActive;
 
         #region === UNITY FUNC ===
+
         private void Awake()
         {
-            _playerControls = new PlayerControls();
+            _playerInputs = new PlayerActionControls();
+        }
+
+        private void Start()
+        {
+            SwitchCurrentActionMap(_currentActionMapActive.ToString());
         }
 
         private void OnEnable()
@@ -32,43 +43,16 @@ namespace PlayerSystem
         #endregion
 
         #region === ACTION MAP FUNC ===
-        public Dictionary<string, InputActionMap> actionMaps { get; private set; }
 
-        // adds all mapNames in a Dictionary
-        private void UpdateActionMapList()
-        {
-            actionMaps.Clear();
-            foreach(var map in _playerControls.asset.actionMaps)
-            {
-                actionMaps.Add(map.name, map);
-            }
-        }
 
         //This basically chooses an actionmap to be enabled and disables the rest.
         public void SwitchCurrentActionMap(string mapName)
         {
-            if (actionMaps.Count == 0 || actionMaps == null)
+            foreach(var actionMap in _playerInputs.asset.actionMaps)
             {
-                Debug.LogError("There are currently no Action maps added or action maps are null");
-                return;
+                actionMap.Disable();
             }
-
-            foreach (var map in actionMaps)
-            {
-                if (mapName != map.Key)
-                {
-                    map.Value.Disable();
-                }
-                else
-                {
-                    if (map.Value.enabled)
-                    {
-                        Debug.LogWarning("Action map is already Enabled!");
-                        return;
-                    }
-                    map.Value.Enable();
-                }
-            }
+            _playerInputs.asset.FindActionMap(mapName).Enable();
         }
         #endregion
 
@@ -86,11 +70,10 @@ namespace PlayerSystem
 
         private void SubscribeGameplay()
         {
-            InputActionMap inputActions = _playerControls.Gameplay;
+            InputActionMap inputActions = _playerInputs.Gameplay;
 
             inputActions.FindAction(StringManager.MOVEMENT).performed += OnMovement;
             inputActions.FindAction(StringManager.MOVEMENT).canceled += OnMovement;
-
 
             inputActions.FindAction(StringManager.LOOK).performed += OnLook;
             inputActions.FindAction(StringManager.LOOK).canceled += OnLook;
@@ -105,7 +88,7 @@ namespace PlayerSystem
 
         private void UnsubscribeGameplay()
         {
-            InputActionMap inputActions = _playerControls.Gameplay;
+            InputActionMap inputActions = _playerInputs.Gameplay;
 
             inputActions.FindAction(StringManager.MOVEMENT).performed -= OnMovement;
             inputActions.FindAction(StringManager.MOVEMENT).canceled -= OnMovement;
@@ -123,8 +106,10 @@ namespace PlayerSystem
         #region ==== MOVEMENT FUNC ====
         private void OnMovement(InputAction.CallbackContext obj)
         {
+
             Vector2 inputAxis = obj.ReadValue<Vector2>();
             Vector3 vector3InputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
+            Debug.Log(vector3InputAxis);
             onRawGroundMovementInput(vector3InputAxis);
         }
 
@@ -158,13 +143,13 @@ namespace PlayerSystem
         #region ==== MENU ====
         private void SubscribeMenu()
         {
-            InputActionMap inputActions = _playerControls.Menu;
+            InputActionMap inputActions = _playerInputs.Menu;
         }
 
         private void UnsubscribeMenu()
         {
-            InputActionMap inputActions = _playerControls.Menu;
-            
+            InputActionMap inputActions = _playerInputs.Menu;
+
         }
         #endregion
 

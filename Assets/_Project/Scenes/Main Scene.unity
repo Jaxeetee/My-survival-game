@@ -2594,7 +2594,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1530587721}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b969c3e03534e174f895894d02db0236, type: 3}
   m_Name: 
@@ -2607,7 +2607,7 @@ MonoBehaviour:
   _smoothness: 0.5
   _maxVerticalAngle: 75
   _minVerticalAngle: -75
-  _playerController: {fileID: 1774504539}
+  _playerController: {fileID: 0}
 --- !u!4 &1530587723
 Transform:
   m_ObjectHideFlags: 0
@@ -2883,10 +2883,8 @@ GameObject:
   - component: {fileID: 1774504536}
   - component: {fileID: 1774504535}
   - component: {fileID: 1774504537}
-  - component: {fileID: 1774504538}
-  - component: {fileID: 1774504539}
-  - component: {fileID: 1774504540}
   - component: {fileID: 1774504541}
+  - component: {fileID: 1774504540}
   m_Layer: 0
   m_Name: = PLAYER =
   m_TagString: Untagged
@@ -2905,9 +2903,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.2
-  m_Height: 1.45
+  m_Height: 1.69
   m_Direction: 1
-  m_Center: {x: 0, y: 0.74, z: 0}
+  m_Center: {x: 0, y: 0.78, z: 0}
 --- !u!4 &1774504536
 Transform:
   m_ObjectHideFlags: 0
@@ -2941,65 +2939,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &1774504538
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1774504534}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 473ad374845f9eb45a0fa4cbda921d4d, type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: f80f74b5-5a15-446a-a130-5b42dccea52e
-    m_ActionName: Gameplay/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 59cd7cf7-d13c-473a-9b35-d6db787ada6d
-    m_ActionName: Gameplay/Jump[/Keyboard/space]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: a67f3d6a-dca8-45a8-9eb5-f388e4b62f7e
-    m_ActionName: Gameplay/Shoot[/Mouse/leftButton]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: bafbcc27-1353-42ef-a256-62df0a365c66
-    m_ActionName: Menu/New action
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Gameplay
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 963194227}
---- !u!114 &1774504539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1774504534}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ced8ed576efc2447859b63cfd2b8af4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _movementSmoothingSpeed: 9
 --- !u!114 &1774504540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3012,11 +2951,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfdaf15c0e22184b87466a83fb37427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementSpeed: 0
-  _maxSlopeAngleWalkable: 0
-  _sprintSpeedMultiplier: 0
-  _maxStamina: 0
-  _staminaDropOffMultiplier: 0
+  _movementSpeed: 2
+  _maxSlopeAngleWalkable: 45
+  _sprintSpeedMultiplier: 2
+  _maxStamina: 100
+  _staminaDropOffMultiplier: 2
 --- !u!114 &1774504541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3029,6 +2968,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b0ca5424d8ff294398578755e2a3e50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInput: {fileID: -944628639613478452, guid: c287bfec7e71f074ea6b97471255a05e, type: 3}
 --- !u!1001 &1853099337
 PrefabInstance:
   m_ObjectHideFlags: 0

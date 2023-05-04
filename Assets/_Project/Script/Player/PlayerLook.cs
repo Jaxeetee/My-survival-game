@@ -66,7 +66,6 @@ using UnityEngine.InputSystem;
 
             
             _smoothLook = Vector2.Lerp(_smoothLook, _lookInput, _smoothness);
-            Debug.Log($"smooth look value at x axis: {_smoothLook.x}");
 
             _verticalClamp = Mathf.Clamp(_verticalClamp - _smoothLook.y, -_maxAngleAlongYAxis, _maxAngleAlongYAxis);
             transform.localRotation = Quaternion.Euler(_verticalClamp, 0f, 0f);
