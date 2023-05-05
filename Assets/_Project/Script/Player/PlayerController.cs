@@ -166,7 +166,6 @@ public class PlayerController : MonoBehaviour
             crouchInputValue = ctx.ReadValue<float>();
 
             didToggleCrouch = true;
-            Debug.Log($"did press {didToggleCrouch}");
         }
     }
 

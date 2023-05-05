@@ -64,7 +64,9 @@ namespace PlayerSystem.InputSystem
         //GROUND MOVEMENT
         public event Action<Vector3> onRawGroundMovementInput;
         // CROUCH / SLIDE
-        public event Action<float> onRawCrouchInput;
+        public event Action onRawCrouchPressedInput;
+
+        public event Action OnRawCrouchReleaseInput;
         // SPRINT
         public event Action<float> onRawSprintInput;
 
@@ -81,8 +83,8 @@ namespace PlayerSystem.InputSystem
             inputActions.FindAction(StringManager.SPRINT).performed += OnSprint;
             inputActions.FindAction(StringManager.SPRINT).canceled += OnSprint;
 
-            inputActions.FindAction(StringManager.CROUCH).performed += OnCrouch;
-            inputActions.FindAction(StringManager.CROUCH).canceled += OnCrouch;
+            inputActions.FindAction(StringManager.CROUCH).performed += OnCrouchPressed;
+            inputActions.FindAction(StringManager.CROUCH).canceled += OnCrouchRelease;
         }
 
 
@@ -99,17 +101,15 @@ namespace PlayerSystem.InputSystem
             inputActions.FindAction(StringManager.SPRINT).performed -= OnSprint;
             inputActions.FindAction(StringManager.SPRINT).canceled -= OnSprint;
 
-            inputActions.FindAction(StringManager.CROUCH).performed += OnCrouch;
-            inputActions.FindAction(StringManager.CROUCH).canceled += OnCrouch;
+            inputActions.FindAction(StringManager.CROUCH).performed -= OnCrouchPressed;
+            inputActions.FindAction(StringManager.CROUCH).canceled -= OnCrouchRelease;
         }
 
         #region ==== MOVEMENT FUNC ====
         private void OnMovement(InputAction.CallbackContext obj)
         {
-
             Vector2 inputAxis = obj.ReadValue<Vector2>();
             Vector3 vector3InputAxis = new Vector3(inputAxis.x, 0, inputAxis.y);
-            Debug.Log(vector3InputAxis);
             onRawGroundMovementInput(vector3InputAxis);
         }
 
@@ -125,12 +125,15 @@ namespace PlayerSystem.InputSystem
             onRawSprintInput?.Invoke(inputPressed);
         }
 
-        private void OnCrouch(InputAction.CallbackContext obj)
+        private void OnCrouchPressed(InputAction.CallbackContext obj)
         {
-            float inputPressed = obj.ReadValue<float>();
-            onRawCrouchInput?.Invoke(inputPressed);
+            onRawCrouchPressedInput?.Invoke();
         }
 
+        private void OnCrouchRelease(InputAction.CallbackContext obj)
+        {
+            OnRawCrouchReleaseInput?.Invoke();
+        }
 
         #endregion
 

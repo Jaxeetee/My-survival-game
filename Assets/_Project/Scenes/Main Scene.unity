@@ -616,7 +616,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27574
+  m_Name: pb_Mesh27590
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2950,11 +2950,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfdaf15c0e22184b87466a83fb37427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementSpeed: 2
+  _movementSpeed: 10
   _maxSlopeAngleWalkable: 45
   _sprintSpeedMultiplier: 2
+  _isSprintToggle: 0
   _maxStamina: 100
   _staminaDropOffMultiplier: 2
+  _crouchSpeedMultiplier: 50
+  _isCrouchToggle: 1
 --- !u!114 &1774504541
 MonoBehaviour:
   m_ObjectHideFlags: 0
