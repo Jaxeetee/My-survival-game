@@ -44,7 +44,6 @@ namespace InputSystem
 
         #region === ACTION MAP FUNC ===
 
-
         //This basically chooses an actionmap to be enabled and disables the rest.
         public void SwitchCurrentActionMap(string mapName)
         {
@@ -92,7 +91,6 @@ namespace InputSystem
             inputActions.FindAction(StringManager.CROUCH).performed += OnCrouchPress;
             inputActions.FindAction(StringManager.CROUCH).canceled += OnCrouchRelease;
         }
-
 
         private void UnsubscribeGameplay()
         {
