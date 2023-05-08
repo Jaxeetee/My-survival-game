@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-using PlayerSystem.InputSystem;
+using InputSystem;
 
 namespace PlayerSystem
 {
@@ -35,11 +35,24 @@ namespace PlayerSystem
         [Space(20)]
         [Header("Sprint Variables")]
         [Tooltip("Multiplies to _movementSpeed")]
-        [SerializeField, Range(0f, 5f)]
+        [SerializeField, Range(0f, 100f)]
         private float _sprintSpeedMultiplier;
+
         [SerializeField]
         private bool _isSprintToggle;
 
+        #endregion
+
+        #region === CROUCH VAR ===
+        [Space(20)]
+        [Header("CrouchProperties")]
+        [Tooltip("This gets the percentage of the movement Speed")]
+        [SerializeField, Range(0, 100)]
+        private int _crouchSpeedMultiplier;
+
+        [SerializeField]
+        private bool _isCrouchToggle;
+        private bool _didToggleCrouch;
         #endregion
 
         #region === STAMINA VAR ===
@@ -54,24 +67,10 @@ namespace PlayerSystem
         public float currentStamina { get; private set; }
         #endregion
 
-
-        #region === CROUCH VAR ===
-        [Space(20)]
-        [Header("CrouchProperties")]
-        [Tooltip("This gets the percentage of the movement Speed")]
-        [SerializeField, Range(0, 100)]
-        private int _crouchSpeedMultiplier;
-
-        [SerializeField]
-        private bool _isCrouchToggle;
-        private bool _isCrouching;
-        private bool _didToggleCrouch;
-        #endregion
-
         #region === INPUT VARS ===
         private Vector3 _inputMovementDirection;
-        private float _inputSprint;
-        private float _inputCrouch;
+        private bool _isCrouching;
+        private bool _isSprinting;
         #endregion
 
 
@@ -91,47 +90,48 @@ namespace PlayerSystem
         private void OnEnable()
         {
             _inputHandler.onRawGroundMovementInput += UpdateInputMovementDirection;
-            _inputHandler.onRawCrouchPressedInput += InputCrouchPressed;
-            _inputHandler.OnRawCrouchReleaseInput += InputCrouchReleased;
-            _inputHandler.onRawCrouchPressedInput += InputCrouchPressedToggle;
-            _inputHandler.OnRawCrouchReleaseInput += InputCrouchReleasedToggle;
-            _inputHandler.onRawSprintInput += UpdateInputSprint;
+
+            _inputHandler.OnCrouchStartedInput += InputCrouchStarted;
+            _inputHandler.OnCrouchHoldInput += InputCrouchOnHold;
+            _inputHandler.OnCrouchReleasedInput += InputCrouchReleased;
+
+            _inputHandler.OnSprintStartedInput += InputSprintStarted;
+            _inputHandler.OnSprintHoldInput += InputSprintOnHold;
+            _inputHandler.OnSprintReleasedInput -= InputSprintReleased;
         }
 
         private void OnDisable()
         {
             _inputHandler.onRawGroundMovementInput -= UpdateInputMovementDirection;
-            _inputHandler.onRawCrouchPressedInput -= InputCrouchPressed;
-            _inputHandler.OnRawCrouchReleaseInput -= InputCrouchReleased;
-            _inputHandler.onRawCrouchPressedInput -= InputCrouchPressedToggle;
-            _inputHandler.OnRawCrouchReleaseInput -= InputCrouchReleasedToggle;
-            _inputHandler.onRawSprintInput -= UpdateInputSprint;
+
+            _inputHandler.OnCrouchStartedInput -= InputCrouchStarted;
+            _inputHandler.OnCrouchHoldInput -= InputCrouchOnHold;
+            _inputHandler.OnCrouchReleasedInput -= InputCrouchReleased;
+
+            _inputHandler.OnSprintStartedInput -= InputSprintStarted;
+            _inputHandler.OnSprintHoldInput -= InputSprintOnHold;
+            _inputHandler.OnSprintReleasedInput -= InputSprintReleased;
         }
 
         private void Update()
         {
-            Debug.Log(currentState);
-            Debug.Log($"is crouching: {_isCrouching}");
-
+            Debug.Log($"current State: {currentState}");
             switch (currentState)
             {
                 case MovementState.Crouch:
                     Crouch();
                     break;
                 case MovementState.Sprint:
+                    Sprint();
+                    break;
+                case MovementState.Slide:
 
                     break;
-                case MovementState.Slide: 
-
-                    break;
-                case MovementState.FlatMovement:
+                case MovementState.Default:
                     NormalState();
-                    //currentMovementSpeed = _movementSpeed;
                     break;
-                case MovementState.SlopeMovement:
+                default:
                     NormalState();
-                    //currentMovementSpeed = _movementSpeed;
-
                     break;
             }
         }
@@ -177,7 +177,6 @@ namespace PlayerSystem
         {
             if (OnWalkableSlope())
             {
-                if (!_isCrouching) currentState = MovementState.SlopeMovement;
                 //To remove unecessary jump off of the player involving ramps especially when going down.
                 if (_rb.velocity.y > 0f)
                 {
@@ -187,7 +186,6 @@ namespace PlayerSystem
             }
             else
             {
-                if (!_isCrouching) currentState = MovementState.FlatMovement;
                 return GetFrontDirection();
             }
         }
@@ -206,13 +204,24 @@ namespace PlayerSystem
         #region === CROUCH FUNC ===
         private void Crouch()
         {
+
             currentMovementSpeed = _crouchSpeedMultiplier / 100f * _movementSpeed;
         }
         #endregion
 
         #region === SPRINT FUNC ===
-
+        private void Sprint()
+        {
+            currentMovementSpeed = (_sprintSpeedMultiplier / 100f * _movementSpeed) + _movementSpeed;
+        }
         #endregion
+
+        private void SwitchMovementState(MovementState state)
+        {
+            Debug.Log($"Current state: {state}");
+            currentState = state;
+
+        }
 
         #region === INPUT GETTER ===
         private void UpdateInputMovementDirection(Vector3 inputMovementDirection)
@@ -221,259 +230,69 @@ namespace PlayerSystem
         }
 
         #region ==== CROUCH ====
-        #region ===== HOLD KEY =====
-        private void InputCrouchPressed()
+        private void InputCrouchStarted()
+        {
+            if (!_isCrouchToggle) return; // this just says if the player decided not to use toggle for crouching
+
+            // on key down
+            _isCrouching = !_isCrouching; // this determines if the player is crouching or not
+
+            if (_isCrouching)
+                currentState = MovementState.Crouch;
+            else
+                currentState = MovementState.Default;
+        }
+
+        private void InputCrouchOnHold(bool value)
         {
             if (_isCrouchToggle) return;
 
             currentState = MovementState.Crouch;
-            _isCrouching = true;
+            _isCrouching = value;
         }
 
-        private void InputCrouchReleased()
+        private void InputCrouchReleased(bool value)
         {
             if (_isCrouchToggle) return;
-
-            _isCrouching = false;
+            currentState = MovementState.Default;
+            _isCrouching = value;
         }
+
         #endregion
 
-        #region ===== TOGGLE KEY =====
-        private void InputCrouchPressedToggle()
+        #region ==== SPRINT ====
+
+        private void InputSprintStarted()
         {
-            if (!_isCrouchToggle) return; // this just says if the player decided not to use toggle for crouching
+            if (!_isSprintToggle) return;
 
-            if (!_didToggleCrouch)
-            {
-                // on key down
-                _isCrouching = !_isCrouching; // this determines if the player is crouching or not
-                currentState = MovementState.Crouch;
+            _isSprinting = !_isSprinting;
 
-                _didToggleCrouch = true;
-            }
-            Debug.Log($"did toggle crouch: {_didToggleCrouch}");
+            if (_isSprinting)
+                currentState = MovementState.Sprint;
+            else
+                currentState = MovementState.Default;
         }
 
-        private void InputCrouchReleasedToggle()
+        private void InputSprintOnHold(bool value)
         {
-            if (!_isCrouchToggle) return;
+            if (_isSprintToggle) return;
 
-            if (_didToggleCrouch) _didToggleCrouch = false;
+            currentState = MovementState.Sprint;
+            _isSprinting = value;
         }
-        #endregion
-        #endregion
 
-        private void UpdateInputSprint(float inputValue)
+        private void InputSprintReleased(bool value)
         {
-            _inputSprint = inputValue;
+            if (_isSprintToggle) return;
+
+            currentState = MovementState.Default;
+            _isSprinting = value;
         }
+
         #endregion
 
+        #endregion
     }
 
 }
-
-
-//using System;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-//using UnityEngine.InputSystem;
-
-//public class PlayerMovement : MonoBehaviour
-//{
-
-//#region --- PLAYER MOVEMENT ---
-
-//    [SerializeField]
-//    private float _playerNormalSpeed = 5.0f;
-
-//    [SerializeField, Range(0f, 10f)]
-//    [Tooltip("The closer to 0, the slippier the feel")]
-//    private float _smoothMovementMultiplier = 7.0f;
-//    private float _smoothMovementSpeed = 0f;
-
-//    public float playerMovementSpeed{
-//        get => _playerMovementSpeed;
-//        set => _playerMovementSpeed = value;
-//    }
-//    private Vector3 _smoothMovement;
-
-//    [Header("Slope Handler Variables")]
-//    [SerializeField]
-//    private float _maxSlope; // max slope 
-//    private RaycastHit _slopeHit; // checks the feet of the player to identify the angle of the player in relations to the ground
-
-
-//    private float _playerMovementSpeed;
-
-//    private Rigidbody _rb; 
-//    private Vector3 _movementDirection; //gets the movement direction of the player
-
-//#endregion
-
-
-//#region --- SPRINT ---
-//    [SerializeField, Tooltip("when player is sprinting.")]
-//    private float _sprintSpeedMultiplier;
-//    private float _sprintInput;
-
-//#endregion
-
-//#region --- CROUCH ---
-
-//    [SerializeField, Tooltip("Measured in percentage of a player Normal Speed. So if it is set to 25%, crouch speed will be 25% of the normal Speed")]
-//    [Range(0f,100f)]
-//    private float _crouchSpeed = 50;
-//    private float _inputCrouch;
-
-//    private bool _isCrouching;
-//#endregion
-
-//#region --- JUMP ---
-//    private bool _toggleCrouch;
-//#endregion
-
-//#region --- INPUT ---
-//    private Vector3 _inputDirection; // gets the raw input direction
-
-//    [SerializeField]
-//    private PlayerController _playerController;
-//#endregion   
-
-
-
-//#region  -= UNITY FUNCTIONS =-
-//    private void Awake()
-//    {
-//        _rb = GetComponent<Rigidbody>();
-//    }
-
-//    private void OnEnable()
-//    {
-//#region -= SUBSCRIBE TO PLAYER CONTROLLER =-
-//        _playerController.onRawMovementInputAxisChange += UpdateInputMovementValue;
-//        _playerController.onCrouchInputValueChange += UpdateInputCrouchValue;
-//        _playerController.onToggleCrouchChange += UpdateCrouchToggle;
-//        _playerController.onSprintInputValueChange += UpdateInputSpringValue;
-//#endregion
-//    }
-
-//    private void Update() {
-//        Debug.Log($"current speed: {playerMovementSpeed}");
-//    }
-
-//    private void FixedUpdate()
-//    {
-//        MovePlayer();
-//        Crouch();
-
-//        _rb.useGravity = !OnSlope(); // checks if player is not on a flat surface
-//    }
-
-//    private void OnDrawGizmos() 
-//    {
-//        Debug.DrawRay(transform.position, -transform.up * 0.8f, Color.red);
-//    }
-//#endregion
-
-//#region -= GROUND MOVEMENT =-
-
-
-//    private bool OnSlope()
-//    {
-//        if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, 2f)) {
-//            float angle = Vector3.Angle(Vector3.up, _slopeHit.normal);
-//            return angle < _maxSlope && angle != 0;
-//        }
-//        return false;
-//    }
-
-//    private Vector3 GetSlopeDirection()
-//    {
-//        Vector3 angledGround = Vector3.ProjectOnPlane(_movementDirection, _slopeHit.normal);
-//        return angledGround;
-//    }
-
-
-//    private delegate bool SpeedCondition();
-//    // changes speed depending on the movement state of the player.
-//    private float ChangePlayerMovementValue(SpeedCondition condition, float changeTo) 
-//    {
-//        float speed = 0f;
-//        if (condition.Invoke()){
-//            speed = changeTo;
-//        }
-//        return speed;
-//    }
-
-
-//#endregion
-
-//#region -= CROUCH & SLIDE =-
-
-//    private void Crouch()
-//    {
-
-//        if (!_isCrouching)
-//        {
-//            _playerMovementSpeed = _playerNormalSpeed;
-//            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * 8f);
-//        }
-//        else 
-//        {
-//            float crouchSpeed = (_crouchSpeed/100) * _playerNormalSpeed;
-//            _playerMovementSpeed = crouchSpeed;
-//            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(1f, 0.5f, 1f), Time.deltaTime * 8f);
-//        }
-
-//    }
-
-
-//#endregion
-
-//#region -= JUMP =-
-
-//    private bool IsGrounded()
-//    {
-//        var onGround = Physics.Raycast(transform.position + new Vector3(0f, 0.5f, 0f), -transform.up,0.8f);
-//        return onGround;
-//    }
-
-//#endregion
-
-//#region -= SPRINT =-
-//    private void UpdateInputSpringValue(float value)
-//    {
-//        _sprintInput = value;
-//    }
-
-//    private bool IsSprinting()
-//    {
-//        return _sprintInput > 0;
-//    }
-//#endregion    
-
-//#region -= INPUT =-
-//    private void UpdateInputMovementValue(Vector3 value)
-//    {
-//        _inputDirection = value;
-//    }
-
-//    private void UpdateInputCrouchValue(float value)
-//    {
-//        _inputCrouch = value;
-//    }
-
-//    private void UpdateCrouchToggle(bool value)
-//    {
-//        _toggleCrouch = value;
-
-//        if (_toggleCrouch) {
-//            _isCrouching = !_isCrouching;
-//        }
-//    }
-
-//#endregion
-
-//}

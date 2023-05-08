@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace PlayerSystem.InputSystem
+namespace InputSystem
 {
     // Using the C# wrapper version. Won't use the PlayerInput Component since I find it lacking
     // Must be attached to a GO where player inputs are needed.
@@ -63,12 +63,16 @@ namespace PlayerSystem.InputSystem
         public event Action<Vector2> onRawMouseLookInput;
         //GROUND MOVEMENT
         public event Action<Vector3> onRawGroundMovementInput;
-        // CROUCH / SLIDE
-        public event Action onRawCrouchPressedInput;
 
-        public event Action OnRawCrouchReleaseInput;
+        // CROUCH / SLIDE
+        public event Action OnCrouchStartedInput;
+        public event Action<bool> OnCrouchHoldInput;
+        public event Action<bool> OnCrouchReleasedInput;
+
         // SPRINT
-        public event Action<float> onRawSprintInput;
+        public event Action OnSprintStartedInput;
+        public event Action<bool> OnSprintHoldInput;
+        public event Action<bool> OnSprintReleasedInput;
 
         private void SubscribeGameplay()
         {
@@ -80,10 +84,12 @@ namespace PlayerSystem.InputSystem
             inputActions.FindAction(StringManager.LOOK).performed += OnLook;
             inputActions.FindAction(StringManager.LOOK).canceled += OnLook;
 
-            inputActions.FindAction(StringManager.SPRINT).performed += OnSprint;
-            inputActions.FindAction(StringManager.SPRINT).canceled += OnSprint;
+            inputActions.FindAction(StringManager.SPRINT).started += OnSprintStart;
+            inputActions.FindAction(StringManager.SPRINT).performed += OnSprintPress; 
+            inputActions.FindAction(StringManager.SPRINT).canceled += OnSprintRelease;
 
-            inputActions.FindAction(StringManager.CROUCH).performed += OnCrouchPressed;
+            inputActions.FindAction(StringManager.CROUCH).started += OnCrouchStart;
+            inputActions.FindAction(StringManager.CROUCH).performed += OnCrouchPress;
             inputActions.FindAction(StringManager.CROUCH).canceled += OnCrouchRelease;
         }
 
@@ -98,10 +104,12 @@ namespace PlayerSystem.InputSystem
             inputActions.FindAction(StringManager.LOOK).performed -= OnLook;
             inputActions.FindAction(StringManager.LOOK).canceled -= OnLook;
 
-            inputActions.FindAction(StringManager.SPRINT).performed -= OnSprint;
-            inputActions.FindAction(StringManager.SPRINT).canceled -= OnSprint;
+            inputActions.FindAction(StringManager.SPRINT).started -= OnSprintStart;
+            inputActions.FindAction(StringManager.SPRINT).performed -= OnSprintPress;
+            inputActions.FindAction(StringManager.SPRINT).canceled -= OnSprintRelease;
 
-            inputActions.FindAction(StringManager.CROUCH).performed -= OnCrouchPressed;
+            inputActions.FindAction(StringManager.CROUCH).started -= OnCrouchStart;
+            inputActions.FindAction(StringManager.CROUCH).performed -= OnCrouchPress;
             inputActions.FindAction(StringManager.CROUCH).canceled -= OnCrouchRelease;
         }
 
@@ -119,21 +127,44 @@ namespace PlayerSystem.InputSystem
             onRawMouseLookInput(inputAxis);
         }
 
-        private void OnSprint(InputAction.CallbackContext obj)
+        #region ==== SPRINT ====
+        private void OnSprintStart(InputAction.CallbackContext obj)
         {
-            float inputPressed = obj.ReadValue<float>();
-            onRawSprintInput?.Invoke(inputPressed);
+            OnSprintStartedInput?.Invoke();
         }
 
-        private void OnCrouchPressed(InputAction.CallbackContext obj)
+        private void OnSprintPress(InputAction.CallbackContext obj)
         {
-            onRawCrouchPressedInput?.Invoke();
+            bool sprinting = obj.ReadValueAsButton();
+            OnSprintHoldInput?.Invoke(sprinting);
+        }
+
+        private void OnSprintRelease(InputAction.CallbackContext obj)
+        {
+            bool sprinting = obj.ReadValueAsButton();
+            OnSprintReleasedInput?.Invoke(sprinting);
+        }
+        #endregion
+
+        #region ==== CROUCH ====
+        private void OnCrouchStart(InputAction.CallbackContext obj)
+        {
+            OnCrouchStartedInput?.Invoke();
+        }
+
+        private void OnCrouchPress(InputAction.CallbackContext obj)
+        {
+            bool crouching = obj.ReadValueAsButton();
+            OnCrouchHoldInput?.Invoke(crouching);
         }
 
         private void OnCrouchRelease(InputAction.CallbackContext obj)
         {
-            OnRawCrouchReleaseInput?.Invoke();
+            bool crouching = obj.ReadValueAsButton();
+            OnCrouchReleasedInput?.Invoke(crouching);
         }
+        #endregion
+
 
         #endregion
 

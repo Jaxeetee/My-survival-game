@@ -1,5 +1,5 @@
 {
-    "name": "PlayerControls",
+    "name": "PlayerActionControls",
     "maps": [
         {
             "name": "Gameplay",
@@ -39,7 +39,7 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [

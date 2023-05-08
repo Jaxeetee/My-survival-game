@@ -2,8 +2,7 @@ namespace PlayerSystem
 {
     public enum MovementState
     {
-        SlopeMovement,
-        FlatMovement,
+        Default,
         Slide,
         Crouch,
         Sprint

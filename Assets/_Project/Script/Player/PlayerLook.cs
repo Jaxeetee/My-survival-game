@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using PlayerSystem.InputSystem;
+
+using InputSystem;
 
 namespace PlayerSystem
 {

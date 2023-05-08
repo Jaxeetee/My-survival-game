@@ -2953,11 +2953,11 @@ MonoBehaviour:
   _movementSpeed: 10
   _maxSlopeAngleWalkable: 45
   _sprintSpeedMultiplier: 2
-  _isSprintToggle: 0
-  _maxStamina: 100
-  _staminaDropOffMultiplier: 2
+  _isSprintToggle: 1
   _crouchSpeedMultiplier: 50
   _isCrouchToggle: 1
+  _maxStamina: 100
+  _staminaDropOffMultiplier: 2
 --- !u!114 &1774504541
 MonoBehaviour:
   m_ObjectHideFlags: 0

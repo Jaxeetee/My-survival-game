@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PlayerSystem.InputSystem
+namespace InputSystem
 {
     public enum ActionMapsType
     {
